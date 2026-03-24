@@ -1,0 +1,10 @@
+{
+  "events": [
+    { "type": "mp:sound-enabled", "ts": 0 },
+    { "type": "mp:persona:selected", "ts": 500, "detail": { "key": "strategist" } },
+    { "type": "mp:drift:update", "ts": 1200, "detail": { "focus": 0.62, "fatigue": 0.41 } },
+    { "type": "mp:cue_audit", "ts": 2000, "detail": { "audit_score": 0.78 } },
+    { "type": "mp:style_outcome", "ts": 2600, "detail": { "style": "strategist", "success": true } },
+    { "type": "mp:layout:diff", "ts": 3400, "detail": { "gain_pct": 4.2 } }
+  ]
+}

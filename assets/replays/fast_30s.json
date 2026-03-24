@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "title": "Solar Fast 30s",
+  "events": [
+    { "delay": 0,  "type": "mp:solar:update", "detail": { "production_mwh": 3.2, "efficiency_pct": 92.4, "p95_latency_ms": 85, "predicted_yield_uplift_pct": 1.8, "baseline_mwh": 3.14, "status": "optimizing", "next_adjust": 0 } },
+    { "delay": 6000,  "type": "mp:solar:update", "detail": { "production_mwh": 3.4, "efficiency_pct": 93.0, "p95_latency_ms": 80, "predicted_yield_uplift_pct": 2.4, "baseline_mwh": 3.18, "status": "optimizing", "next_adjust": 0 } },
+    { "delay": 8000,  "type": "mp:solar:update", "detail": { "production_mwh": 3.7, "efficiency_pct": 94.2, "p95_latency_ms": 78, "predicted_yield_uplift_pct": 3.1, "baseline_mwh": 3.22, "status": "tracking", "next_adjust": 0 } },
+    { "delay": 8000,  "type": "mp:solar:update", "detail": { "production_mwh": 3.9, "efficiency_pct": 95.0, "p95_latency_ms": 76, "predicted_yield_uplift_pct": 3.8, "baseline_mwh": 3.25, "status": "tracking", "next_adjust": 0 } }
+  ]
+}
+

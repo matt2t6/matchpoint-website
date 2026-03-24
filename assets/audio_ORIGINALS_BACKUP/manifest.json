@@ -1,0 +1,9 @@
+{
+  "crowd_bed_soft": "assets/audio/crowd_noise.mp3",
+  "crowd_anticipation": "assets/audio/crowd_noise.mp3",
+  "crowd_rally": "assets/audio/crowd_noise.mp3",
+  "crowd_applause_mid": "assets/audio/crowd_noise.mp3",
+  "crowd_applause_big": "assets/audio/crowd_noise.mp3",
+  "serve_toss": "assets/audio/crowd_noise.mp3",
+  "ball_loop": "assets/audio/crowd_noise.mp3"
+}

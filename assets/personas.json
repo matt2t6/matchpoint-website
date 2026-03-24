@@ -1,0 +1,30 @@
+{
+  "TacticalCoach": {
+    "clips": [
+      "/assets/audio/tactical/tactical_01.mp3",
+      "/assets/audio/tactical/tactical_02.mp3",
+      "/assets/audio/tactical/tactical_03.mp3"
+    ]
+  },
+  "MentalResetAgent": {
+    "clips": [
+      "/assets/audio/reset/reset_01.mp3",
+      "/assets/audio/reset/reset_02.mp3",
+      "/assets/audio/reset/reset_03.mp3"
+    ]
+  },
+  "RecoveryCoach": {
+    "clips": [
+      "/assets/audio/recovery/recovery_01.mp3",
+      "/assets/audio/recovery/recovery_02.mp3",
+      "/assets/audio/recovery/recovery_03.mp3"
+    ]
+  },
+  "system_neutral": {
+    "clips": [
+      "/assets/audio/coach_s_calibration.mp3",
+      "/assets/audio/coach_s_cooldown_breathe.mp3"
+    ]
+  }
+}
+

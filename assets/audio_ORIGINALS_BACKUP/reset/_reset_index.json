@@ -1,0 +1,322 @@
+[
+  {
+    "original_filename": "reset_01.mp3",
+    "new_filename": "reset_01_stay_focused_champions_made.mp3",
+    "cue_text": "Stay focused. Champions are made in practice.",
+    "category": "reset",
+    "emotion": "celebratory",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:41:39.807916"
+  },
+  {
+    "original_filename": "reset_02.mp3",
+    "new_filename": "reset_02_mental_strength_wins_matches.mp3",
+    "cue_text": "Mental strength wins matches.",
+    "category": "reset",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:41:51.894839"
+  },
+  {
+    "original_filename": "reset_03.mp3",
+    "new_filename": "general_03_trust_training_got_this.mp3",
+    "cue_text": "Trust your training, you got this!",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:42:07.593345"
+  },
+  {
+    "original_filename": "reset_04.mp3",
+    "new_filename": "general_04_every_point_matters_play.mp3",
+    "cue_text": "Every point matters. Play with purpose.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:42:17.344601"
+  },
+  {
+    "original_filename": "reset_05.mp3",
+    "new_filename": "tactical_05_find_rhythm_feel_flow.mp3",
+    "cue_text": "Find your rhythm. Feel the flow of the game.",
+    "category": "tactical",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:42:33.013416"
+  },
+  {
+    "original_filename": "reset_06.mp3",
+    "new_filename": "general_06_patience_wins_points_wait.mp3",
+    "cue_text": "Patience wins points. Wait for your opportunity.",
+    "category": "general",
+    "emotion": "strategic",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:42:44.994127"
+  },
+  {
+    "original_filename": "reset_07.mp3",
+    "new_filename": "general_07_drop_last_moment_start.mp3",
+    "cue_text": "Drop the last moment, start fresh.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "warmup",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:42:57.584277"
+  },
+  {
+    "original_filename": "reset_08.mp3",
+    "new_filename": "reset_08_deep_breath_recalibrate.mp3",
+    "cue_text": "Deep breath, recalibrate.",
+    "category": "reset",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:43:07.120442"
+  },
+  {
+    "original_filename": "reset_09.mp3",
+    "new_filename": "general_09_clear_clutter_see_play.mp3",
+    "cue_text": "Clear the clutter. See the play.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:43:17.136050"
+  },
+  {
+    "original_filename": "reset_10.mp3",
+    "new_filename": "reset_10_focus_reset_one_task.mp3",
+    "cue_text": "Focus Reset. One task, one target.",
+    "category": "reset",
+    "emotion": "focused",
+    "phase": "crisis",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:43:26.855651"
+  },
+  {
+    "original_filename": "reset_11.mp3",
+    "new_filename": "general_11_flush_noise_stay_here.mp3",
+    "cue_text": "Flush the noise, stay here.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:43:36.415813"
+  },
+  {
+    "original_filename": "reset_12.mp3",
+    "new_filename": "reset_12_reset_engaged_clean_slate.mp3",
+    "cue_text": "Reset engaged. Clean slate.",
+    "category": "reset",
+    "emotion": "neutral",
+    "phase": "crisis",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:43:47.303776"
+  },
+  {
+    "original_filename": "reset_13.mp3",
+    "new_filename": "reset_13_mental_reset_engaged.mp3",
+    "cue_text": "Mental Reset Engaged.",
+    "category": "reset",
+    "emotion": "neutral",
+    "phase": "crisis",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:43:56.883767"
+  },
+  {
+    "original_filename": "reset_14.mp3",
+    "new_filename": "general_14_not_behind_here.mp3",
+    "cue_text": "You're not behind, you're here.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:44:08.631076"
+  },
+  {
+    "original_filename": "reset_15.mp3",
+    "new_filename": "general_15_let_mistake.mp3",
+    "cue_text": "Let the mistake go.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:44:19.232681"
+  },
+  {
+    "original_filename": "reset_16.mp3",
+    "new_filename": "general_16_reclaim_clarity.mp3",
+    "cue_text": "Reclaim your clarity.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:44:29.410002"
+  },
+  {
+    "original_filename": "reset_17.mp3",
+    "new_filename": "general_17_start_fresh_residue.mp3",
+    "cue_text": "Start fresh, no residue.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "warmup",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:45:32.604127"
+  },
+  {
+    "original_filename": "reset_18.mp3",
+    "new_filename": "reset_18_focus_execution.mp3",
+    "cue_text": "Focus on execution.",
+    "category": "reset",
+    "emotion": "focused",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:46:36.064127"
+  },
+  {
+    "original_filename": "reset_19.mp3",
+    "new_filename": "reset_19_reset_loop.mp3",
+    "cue_text": "Reset the loop.",
+    "category": "reset",
+    "emotion": "neutral",
+    "phase": "crisis",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:46:53.886938"
+  },
+  {
+    "original_filename": "reset_20.mp3",
+    "new_filename": "general_20_back.mp3",
+    "cue_text": "You're back.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:47:08.628621"
+  },
+  {
+    "original_filename": "reset_21.mp3",
+    "new_filename": "general_21_flush_last_point_gone.mp3",
+    "cue_text": "Flush the last point, it's gone.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:47:34.041217"
+  },
+  {
+    "original_filename": "reset_22.mp3",
+    "new_filename": "reset_22_refocus_now_clean_slate.mp3",
+    "cue_text": "Refocus now. Clean slate.",
+    "category": "reset",
+    "emotion": "focused",
+    "phase": "crisis",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:47:47.654182"
+  },
+  {
+    "original_filename": "reset_23.mp3",
+    "new_filename": "general_23_let_miss.mp3",
+    "cue_text": "Let go of the miss.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:48:15.071346"
+  },
+  {
+    "original_filename": "reset_24.mp3",
+    "new_filename": "reset_24_back_fundamentals.mp3",
+    "cue_text": "Back to fundamentals.",
+    "category": "reset",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:48:31.734622"
+  },
+  {
+    "original_filename": "reset_25.mp3",
+    "new_filename": "general_25_one_task_one_target.mp3",
+    "cue_text": "One task, one target.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:48:49.776503"
+  },
+  {
+    "original_filename": "reset_26.mp3",
+    "new_filename": "general_26_clear_noise.mp3",
+    "cue_text": "Clear the noise.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:49:02.287565"
+  },
+  {
+    "original_filename": "reset_27.mp3",
+    "new_filename": "reset_27_reset_mindset.mp3",
+    "cue_text": "Reset the mindset.",
+    "category": "reset",
+    "emotion": "neutral",
+    "phase": "crisis",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:49:11.616401"
+  },
+  {
+    "original_filename": "reset_28.mp3",
+    "new_filename": "general_28_present_moment_only.mp3",
+    "cue_text": "Present moment only.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:49:24.284279"
+  },
+  {
+    "original_filename": "reset_29.mp3",
+    "new_filename": "general_29_past_future_just_now.mp3",
+    "cue_text": "No past, no future, just now.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:49:38.759670"
+  },
+  {
+    "original_filename": "reset_30.mp3",
+    "new_filename": "reset_30_recenter_intent.mp3",
+    "cue_text": "recenter your intent.",
+    "category": "reset",
+    "emotion": "calming",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:49:49.107395"
+  },
+  {
+    "original_filename": "reset_31.mp3",
+    "new_filename": "reset_31_focus_choice.mp3",
+    "cue_text": "Focus is a choice.",
+    "category": "reset",
+    "emotion": "focused",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:50:02.778042"
+  },
+  {
+    "original_filename": "reset_32.mp3",
+    "new_filename": "general_32_drop_clutter_see_play.mp3",
+    "cue_text": "Drop the clutter, see the play.",
+    "category": "general",
+    "emotion": "neutral",
+    "phase": "any",
+    "source_folder": "reset",
+    "processed_date": "2025-10-21T00:50:14.290911"
+  }
+]

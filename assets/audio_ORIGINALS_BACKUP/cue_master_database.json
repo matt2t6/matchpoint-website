@@ -1,0 +1,1098 @@
+{
+  "tactical": [
+    {
+      "original_filename": "tactical_01.mp3",
+      "new_filename": "tactical_01_perfect_serve_every_ball.mp3",
+      "cue_text": "Perfect your serve. Every ball counts.",
+      "category": "tactical",
+      "emotion": "celebratory",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:27:17.150236"
+    },
+    {
+      "original_filename": "tactical_02.mp3",
+      "new_filename": "general_02_analyze_opponent_find_their.mp3",
+      "cue_text": "Analyze your opponent. Find their weakness.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:27:29.081431"
+    },
+    {
+      "original_filename": "tactical_03.mp3",
+      "new_filename": "general_03_footwork_everything_stay_light.mp3",
+      "cue_text": "Footwork is everything. Stay light on your feet.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:27:39.807515"
+    },
+    {
+      "original_filename": "tactical_04.mp3",
+      "new_filename": "general_04_consistency_beats_power_every.mp3",
+      "cue_text": "Consistency beats power every time.",
+      "category": "general",
+      "emotion": "strategic",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:27:56.569374"
+    },
+    {
+      "original_filename": "tactical_05.mp3",
+      "new_filename": "tactical_05_watch_ball_anticipate_shot.mp3",
+      "cue_text": "Watch the ball, anticipate the shot.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:28:11.400200"
+    },
+    {
+      "original_filename": "tactical_06.mp3",
+      "new_filename": "tactical_06_position_yourself_success_court.mp3",
+      "cue_text": "Position yourself for success. Court awareness is key.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "pressure",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:28:23.405799"
+    },
+    {
+      "original_filename": "tactical_07.mp3",
+      "new_filename": "general_07_adapt_strategy_unpredictable.mp3",
+      "cue_text": "Adapt your strategy. Be unpredictable.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:28:33.200602"
+    },
+    {
+      "original_filename": "tactical_08.mp3",
+      "new_filename": "general_08_power_comes_from_technique.mp3",
+      "cue_text": "Power comes from technique, not force.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:28:45.198310"
+    },
+    {
+      "original_filename": "tactical_09.mp3",
+      "new_filename": "general_09_read_court_anticipate_before.mp3",
+      "cue_text": "Read the court. Anticipate before they hit.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:28:56.246505"
+    },
+    {
+      "original_filename": "tactical_10.mp3",
+      "new_filename": "general_10_exploit_opening_now_window.mp3",
+      "cue_text": "Exploit the opening. Now's your window.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "warmup",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:29:07.364507"
+    },
+    {
+      "original_filename": "tactical_11.mp3",
+      "new_filename": "tactical_11_switch_angle_lock.mp3",
+      "cue_text": "Switch the angle. Lock it in.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:29:17.421521"
+    },
+    {
+      "original_filename": "tactical_12.mp3",
+      "new_filename": "tactical_12_push_pace_force_error.mp3",
+      "cue_text": "Push the pace, force the error.",
+      "category": "tactical",
+      "emotion": "motivational",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:29:27.419510"
+    },
+    {
+      "original_filename": "tactical_13.mp3",
+      "new_filename": "general_13_gaps_seal_lane.mp3",
+      "cue_text": "No gaps, seal the lane.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:29:37.523504"
+    },
+    {
+      "original_filename": "tactical_14.mp3",
+      "new_filename": "general_14_read_pattern_cut_off.mp3",
+      "cue_text": "Read the pattern, cut it off.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:29:47.729506"
+    },
+    {
+      "original_filename": "tactical_15.mp3",
+      "new_filename": "tactical_15_commit_got_shot.mp3",
+      "cue_text": "Commit, you've got the shot.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:29:57.937506"
+    },
+    {
+      "original_filename": "tactical_16.mp3",
+      "new_filename": "tactical_16_drive_pace_make_them.mp3",
+      "cue_text": "Drive the pace, make them react.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:30:08.145966"
+    },
+    {
+      "original_filename": "tactical_17.mp3",
+      "new_filename": "tactical_17_collapse_space_take.mp3",
+      "cue_text": "Collapse the space. Take it.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:30:18.670972"
+    },
+    {
+      "original_filename": "tactical_18.mp3",
+      "new_filename": "tactical_18_force_angle_force_play.mp3",
+      "cue_text": "Force the angle, force the play.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:30:28.777962"
+    },
+    {
+      "original_filename": "tactical_19.mp3",
+      "new_filename": "general_19_pause_keep_blade.mp3",
+      "cue_text": "No pause, keep the blade in.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:30:39.031115"
+    },
+    {
+      "original_filename": "tactical_20.mp3",
+      "new_filename": "general_20_press_until_breaks.mp3",
+      "cue_text": "Press until it breaks.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:30:48.964097"
+    },
+    {
+      "original_filename": "tactical_21.mp3",
+      "new_filename": "general_21_exploit_speed_over_power.mp3",
+      "cue_text": "Exploit speed over power.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:31:00.378742"
+    },
+    {
+      "original_filename": "tactical_22.mp3",
+      "new_filename": "general_22_set_trap_close_fast.mp3",
+      "cue_text": "Set the trap, close it fast.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:31:11.392519"
+    },
+    {
+      "original_filename": "tactical_23.mp3",
+      "new_filename": "general_23_shift_now_before_they.mp3",
+      "cue_text": "Shift now, before they adapt.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:31:22.173432"
+    },
+    {
+      "original_filename": "tactical_24.mp3",
+      "new_filename": "general_24_corner_them_seal_exit.mp3",
+      "cue_text": "Corner them. Seal the exit.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:31:33.047425"
+    },
+    {
+      "original_filename": "tactical_25.mp3",
+      "new_filename": "pressure_25_all_pressure_retreat.mp3",
+      "cue_text": "All pressure, no retreat.",
+      "category": "pressure",
+      "emotion": "neutral",
+      "phase": "pressure",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:31:46.453657"
+    },
+    {
+      "original_filename": "tactical_26.mp3",
+      "new_filename": "tactical_26_drive_pace_make_them.mp3",
+      "cue_text": "Drive the pace, make them react.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:31:57.077400"
+    },
+    {
+      "original_filename": "tactical_27.mp3",
+      "new_filename": "tactical_27_force_angle_force_play.mp3",
+      "cue_text": "Force the angle, force the play.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:32:07.905412"
+    },
+    {
+      "original_filename": "tactical_28.mp3",
+      "new_filename": "general_28_pause_keep_blade.mp3",
+      "cue_text": "No pause, keep the blade in.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:32:29.450759"
+    },
+    {
+      "original_filename": "tactical_29.mp3",
+      "new_filename": "general_29_press_until_breaks.mp3",
+      "cue_text": "Press until it breaks.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:32:41.920427"
+    },
+    {
+      "original_filename": "tactical_30.mp3",
+      "new_filename": "general_30_exploit_speed_over_power.mp3",
+      "cue_text": "Exploit speed over power.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:32:52.431621"
+    },
+    {
+      "original_filename": "tactical_31.mp3",
+      "new_filename": "general_31_set_trap_close_fast.mp3",
+      "cue_text": "Set the trap, close it fast.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:33:03.608949"
+    },
+    {
+      "original_filename": "tactical_32.mp3",
+      "new_filename": "general_32_shift_now_before_they.mp3",
+      "cue_text": "Shift now, before they adapt.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:33:14.869321"
+    },
+    {
+      "original_filename": "tactical_33.mp3",
+      "new_filename": "general_33_corner_them_seal_exit.mp3",
+      "cue_text": "Corner them. Seal the exit.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:33:25.104784"
+    },
+    {
+      "original_filename": "tactical_34.mp3",
+      "new_filename": "pressure_34_all_pressure_retreat.mp3",
+      "cue_text": "All pressure, no retreat.",
+      "category": "pressure",
+      "emotion": "neutral",
+      "phase": "pressure",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:33:34.192146"
+    },
+    {
+      "original_filename": "tactical_35.mp3",
+      "new_filename": "reset_35_strike_before_they_settle.mp3",
+      "cue_text": "Strike before they settle.",
+      "category": "reset",
+      "emotion": "calming",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:33:42.841143"
+    },
+    {
+      "original_filename": "tactical_36.mp3",
+      "new_filename": "general_36_speed_wins_don_hesitate.mp3",
+      "cue_text": "Speed wins, don't hesitate.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:33:52.516652"
+    },
+    {
+      "original_filename": "tactical_37.mp3",
+      "new_filename": "tactical_37_overwhelm_rhythm.mp3",
+      "cue_text": "overwhelm the rhythm.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:34:02.926253"
+    },
+    {
+      "original_filename": "tactical_38.mp3",
+      "new_filename": "tactical_38_snap_rally_take_control.mp3",
+      "cue_text": "Snap the rally, take control.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:34:13.477338"
+    },
+    {
+      "original_filename": "tactical_39.mp3",
+      "new_filename": "general_39_accelerate_brake.mp3",
+      "cue_text": "Accelerate the brake.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:34:23.711969"
+    },
+    {
+      "original_filename": "tactical_40.mp3",
+      "new_filename": "tactical_40_angle_shift_open_court.mp3",
+      "cue_text": "Angle Shift, open the court.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:34:33.875967"
+    },
+    {
+      "original_filename": "tactical_41.mp3",
+      "new_filename": "tactical_41_control_tempo_own_space.mp3",
+      "cue_text": "Control the tempo, own the space.",
+      "category": "tactical",
+      "emotion": "assertive",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:34:43.400490"
+    },
+    {
+      "original_filename": "tactical_42.mp3",
+      "new_filename": "tactical_42_redirect_force_wide_return.mp3",
+      "cue_text": "Redirect, force the wide return.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:34:53.018487"
+    },
+    {
+      "original_filename": "tactical_43.mp3",
+      "new_filename": "general_43_hold_line_bait_move.mp3",
+      "cue_text": "Hold the line, bait the move.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:35:06.131375"
+    },
+    {
+      "original_filename": "tactical_44.mp3",
+      "new_filename": "tactical_44_collapse_space_take.mp3",
+      "cue_text": "Collapse the space. Take it.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:35:16.651764"
+    },
+    {
+      "original_filename": "tactical_45.mp3",
+      "new_filename": "general_45_set_trap_delay_strike.mp3",
+      "cue_text": "Set the trap, delay the strike.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:35:28.960676"
+    },
+    {
+      "original_filename": "tactical_46.mp3",
+      "new_filename": "general_46_they_off_balance_finish.mp3",
+      "cue_text": "They're off balance. Finish it.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:35:40.065418"
+    },
+    {
+      "original_filename": "tactical_47.mp3",
+      "new_filename": "tactical_47_cut_angle_escape.mp3",
+      "cue_text": "Cut the angle, no escape.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:35:53.528573"
+    },
+    {
+      "original_filename": "tactical_48.mp3",
+      "new_filename": "pressure_48_pressure_peak_seal_point.mp3",
+      "cue_text": "Pressure peak, seal the point.",
+      "category": "pressure",
+      "emotion": "neutral",
+      "phase": "pressure",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:36:07.973249"
+    },
+    {
+      "original_filename": "tactical_49.mp3",
+      "new_filename": "general_49_exploit_hesitation_strike_now.mp3",
+      "cue_text": "Exploit hesitation, strike now.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:36:21.288045"
+    },
+    {
+      "original_filename": "tactical_50.mp3",
+      "new_filename": "general_50_expose_blind_spot.mp3",
+      "cue_text": "Expose the blind spot.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "tactical",
+      "processed_date": "2025-10-21T00:36:30.615343"
+    }
+  ],
+  "recovery": [
+    {
+      "original_filename": "recovery_01.mp3",
+      "new_filename": "tactical_01_control_breathing_stay_calm.mp3",
+      "cue_text": "Control your breathing. Stay calm under pressure.",
+      "category": "tactical",
+      "emotion": "calming",
+      "phase": "pressure",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:36:42.401586"
+    },
+    {
+      "original_filename": "recovery_02.mp3",
+      "new_filename": "general_02_recharge_and_stride.mp3",
+      "cue_text": "Recharge and stride.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:36:56.074548"
+    },
+    {
+      "original_filename": "recovery_03.mp3",
+      "new_filename": "tactical_03_breathe_back_control.mp3",
+      "cue_text": "Breathe it back. You're in control.",
+      "category": "tactical",
+      "emotion": "calming",
+      "phase": "crisis",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:37:07.150103"
+    },
+    {
+      "original_filename": "recovery_04.mp3",
+      "new_filename": "reset_04_reset_body_reset_mind.mp3",
+      "cue_text": "Reset the body, reset the mind.",
+      "category": "reset",
+      "emotion": "neutral",
+      "phase": "crisis",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:37:19.635985"
+    },
+    {
+      "original_filename": "recovery_05.mp3",
+      "new_filename": "general_05_steady_heart_steady_hands.mp3",
+      "cue_text": "Steady heart, steady hands.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:37:31.397419"
+    },
+    {
+      "original_filename": "recovery_06.mp3",
+      "new_filename": "general_06_strong_again_move_forward.mp3",
+      "cue_text": "Strong again, move forward.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:37:45.295550"
+    },
+    {
+      "original_filename": "recovery_07.mp3",
+      "new_filename": "tactical_07_slow_rhythm_own_tempo.mp3",
+      "cue_text": "Slow your rhythm. Own your tempo.",
+      "category": "tactical",
+      "emotion": "assertive",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:37:56.147336"
+    },
+    {
+      "original_filename": "recovery_08.mp3",
+      "new_filename": "tactical_08_reclaim_tempo.mp3",
+      "cue_text": "Reclaim your tempo.",
+      "category": "tactical",
+      "emotion": "assertive",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:38:05.152246"
+    },
+    {
+      "original_filename": "recovery_09.mp3",
+      "new_filename": "reset_09_breathe_through_fatigue.mp3",
+      "cue_text": "Breathe through the fatigue.",
+      "category": "reset",
+      "emotion": "calming",
+      "phase": "crisis",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:38:13.770447"
+    },
+    {
+      "original_filename": "recovery_10.mp3",
+      "new_filename": "general_10_steady_system.mp3",
+      "cue_text": "Steady the system.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:38:23.077561"
+    },
+    {
+      "original_filename": "recovery_11.mp3",
+      "new_filename": "general_11_rebuilding_trust.mp3",
+      "cue_text": "You're rebuilding. Trust it.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:38:40.293353"
+    },
+    {
+      "original_filename": "recovery_12.mp3",
+      "new_filename": "recovery_12_recovery_part_win.mp3",
+      "cue_text": "Recovery is part of the win.",
+      "category": "recovery",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:38:51.977170"
+    },
+    {
+      "original_filename": "recovery_13.mp3",
+      "new_filename": "general_13_lower_heart_rate_raise.mp3",
+      "cue_text": "Lower the heart rate. Raise the clarity.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:39:04.313725"
+    },
+    {
+      "original_filename": "recovery_14.mp3",
+      "new_filename": "tactical_14_let_moment_pass_still.mp3",
+      "cue_text": "Let the moment pass, you're still in control.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:39:16.951233"
+    },
+    {
+      "original_filename": "recovery_15.mp3",
+      "new_filename": "reset_15_calm_weapon.mp3",
+      "cue_text": "Calm is your weapon.",
+      "category": "reset",
+      "emotion": "calming",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:39:28.120932"
+    },
+    {
+      "original_filename": "recovery_16.mp3",
+      "new_filename": "tactical_16_reset_baseline.mp3",
+      "cue_text": "Reset the baseline.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "crisis",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:39:37.390678"
+    },
+    {
+      "original_filename": "recovery_17.mp3",
+      "new_filename": "tactical_17_energy_returns_don_rush.mp3",
+      "cue_text": "Energy returns. Don't rush it.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:39:46.711677"
+    },
+    {
+      "original_filename": "recovery_18.mp3",
+      "new_filename": "general_18_rebuild_from_breath.mp3",
+      "cue_text": "Rebuild from the breath.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:39:55.919607"
+    },
+    {
+      "original_filename": "recovery_19.mp3",
+      "new_filename": "recovery_19_recovery_strength.mp3",
+      "cue_text": "Recovery is strength.",
+      "category": "recovery",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:40:04.110804"
+    },
+    {
+      "original_filename": "recovery_20.mp3",
+      "new_filename": "general_20_ready_again.mp3",
+      "cue_text": "You're ready again.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "warmup",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:40:18.851770"
+    },
+    {
+      "original_filename": "recovery_21.mp3",
+      "new_filename": "tactical_21_slow_breath_reset_rhythm.mp3",
+      "cue_text": "Slow your breath, reset your rhythm.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "crisis",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:40:28.621168"
+    },
+    {
+      "original_filename": "recovery_22.mp3",
+      "new_filename": "general_22_let_body_catch.mp3",
+      "cue_text": "Let the body catch up.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:40:39.101230"
+    },
+    {
+      "original_filename": "recovery_23.mp3",
+      "new_filename": "recovery_23_recover_motion.mp3",
+      "cue_text": "Recover in motion.",
+      "category": "recovery",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:40:48.128955"
+    },
+    {
+      "original_filename": "recovery_24.mp3",
+      "new_filename": "general_24_ease_tension_safe.mp3",
+      "cue_text": "Ease the tension. You're safe.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:40:57.778459"
+    },
+    {
+      "original_filename": "recovery_25.mp3",
+      "new_filename": "reset_25_find_center_again.mp3",
+      "cue_text": "Find your center again.",
+      "category": "reset",
+      "emotion": "calming",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:41:06.712636"
+    },
+    {
+      "original_filename": "recovery_26.mp3",
+      "new_filename": "general_26_recharge_between_lines.mp3",
+      "cue_text": "Recharge between the lines.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:41:17.139204"
+    },
+    {
+      "original_filename": "recovery_27.mp3",
+      "new_filename": "reset_27_let_pulse_settle.mp3",
+      "cue_text": "Let the pulse settle.",
+      "category": "reset",
+      "emotion": "calming",
+      "phase": "any",
+      "source_folder": "recovery",
+      "processed_date": "2025-10-21T00:41:27.710780"
+    }
+  ],
+  "reset": [
+    {
+      "original_filename": "reset_01.mp3",
+      "new_filename": "reset_01_stay_focused_champions_made.mp3",
+      "cue_text": "Stay focused. Champions are made in practice.",
+      "category": "reset",
+      "emotion": "celebratory",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:41:39.807916"
+    },
+    {
+      "original_filename": "reset_02.mp3",
+      "new_filename": "reset_02_mental_strength_wins_matches.mp3",
+      "cue_text": "Mental strength wins matches.",
+      "category": "reset",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:41:51.894839"
+    },
+    {
+      "original_filename": "reset_03.mp3",
+      "new_filename": "general_03_trust_training_got_this.mp3",
+      "cue_text": "Trust your training, you got this!",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:42:07.593345"
+    },
+    {
+      "original_filename": "reset_04.mp3",
+      "new_filename": "general_04_every_point_matters_play.mp3",
+      "cue_text": "Every point matters. Play with purpose.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:42:17.344601"
+    },
+    {
+      "original_filename": "reset_05.mp3",
+      "new_filename": "tactical_05_find_rhythm_feel_flow.mp3",
+      "cue_text": "Find your rhythm. Feel the flow of the game.",
+      "category": "tactical",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:42:33.013416"
+    },
+    {
+      "original_filename": "reset_06.mp3",
+      "new_filename": "general_06_patience_wins_points_wait.mp3",
+      "cue_text": "Patience wins points. Wait for your opportunity.",
+      "category": "general",
+      "emotion": "strategic",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:42:44.994127"
+    },
+    {
+      "original_filename": "reset_07.mp3",
+      "new_filename": "general_07_drop_last_moment_start.mp3",
+      "cue_text": "Drop the last moment, start fresh.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "warmup",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:42:57.584277"
+    },
+    {
+      "original_filename": "reset_08.mp3",
+      "new_filename": "reset_08_deep_breath_recalibrate.mp3",
+      "cue_text": "Deep breath, recalibrate.",
+      "category": "reset",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:43:07.120442"
+    },
+    {
+      "original_filename": "reset_09.mp3",
+      "new_filename": "general_09_clear_clutter_see_play.mp3",
+      "cue_text": "Clear the clutter. See the play.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:43:17.136050"
+    },
+    {
+      "original_filename": "reset_10.mp3",
+      "new_filename": "reset_10_focus_reset_one_task.mp3",
+      "cue_text": "Focus Reset. One task, one target.",
+      "category": "reset",
+      "emotion": "focused",
+      "phase": "crisis",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:43:26.855651"
+    },
+    {
+      "original_filename": "reset_11.mp3",
+      "new_filename": "general_11_flush_noise_stay_here.mp3",
+      "cue_text": "Flush the noise, stay here.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:43:36.415813"
+    },
+    {
+      "original_filename": "reset_12.mp3",
+      "new_filename": "reset_12_reset_engaged_clean_slate.mp3",
+      "cue_text": "Reset engaged. Clean slate.",
+      "category": "reset",
+      "emotion": "neutral",
+      "phase": "crisis",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:43:47.303776"
+    },
+    {
+      "original_filename": "reset_13.mp3",
+      "new_filename": "reset_13_mental_reset_engaged.mp3",
+      "cue_text": "Mental Reset Engaged.",
+      "category": "reset",
+      "emotion": "neutral",
+      "phase": "crisis",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:43:56.883767"
+    },
+    {
+      "original_filename": "reset_14.mp3",
+      "new_filename": "general_14_not_behind_here.mp3",
+      "cue_text": "You're not behind, you're here.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:44:08.631076"
+    },
+    {
+      "original_filename": "reset_15.mp3",
+      "new_filename": "general_15_let_mistake.mp3",
+      "cue_text": "Let the mistake go.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:44:19.232681"
+    },
+    {
+      "original_filename": "reset_16.mp3",
+      "new_filename": "general_16_reclaim_clarity.mp3",
+      "cue_text": "Reclaim your clarity.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:44:29.410002"
+    },
+    {
+      "original_filename": "reset_17.mp3",
+      "new_filename": "general_17_start_fresh_residue.mp3",
+      "cue_text": "Start fresh, no residue.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "warmup",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:45:32.604127"
+    },
+    {
+      "original_filename": "reset_18.mp3",
+      "new_filename": "reset_18_focus_execution.mp3",
+      "cue_text": "Focus on execution.",
+      "category": "reset",
+      "emotion": "focused",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:46:36.064127"
+    },
+    {
+      "original_filename": "reset_19.mp3",
+      "new_filename": "reset_19_reset_loop.mp3",
+      "cue_text": "Reset the loop.",
+      "category": "reset",
+      "emotion": "neutral",
+      "phase": "crisis",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:46:53.886938"
+    },
+    {
+      "original_filename": "reset_20.mp3",
+      "new_filename": "general_20_back.mp3",
+      "cue_text": "You're back.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:47:08.628621"
+    },
+    {
+      "original_filename": "reset_21.mp3",
+      "new_filename": "general_21_flush_last_point_gone.mp3",
+      "cue_text": "Flush the last point, it's gone.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:47:34.041217"
+    },
+    {
+      "original_filename": "reset_22.mp3",
+      "new_filename": "reset_22_refocus_now_clean_slate.mp3",
+      "cue_text": "Refocus now. Clean slate.",
+      "category": "reset",
+      "emotion": "focused",
+      "phase": "crisis",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:47:47.654182"
+    },
+    {
+      "original_filename": "reset_23.mp3",
+      "new_filename": "general_23_let_miss.mp3",
+      "cue_text": "Let go of the miss.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:48:15.071346"
+    },
+    {
+      "original_filename": "reset_24.mp3",
+      "new_filename": "reset_24_back_fundamentals.mp3",
+      "cue_text": "Back to fundamentals.",
+      "category": "reset",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:48:31.734622"
+    },
+    {
+      "original_filename": "reset_25.mp3",
+      "new_filename": "general_25_one_task_one_target.mp3",
+      "cue_text": "One task, one target.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:48:49.776503"
+    },
+    {
+      "original_filename": "reset_26.mp3",
+      "new_filename": "general_26_clear_noise.mp3",
+      "cue_text": "Clear the noise.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:49:02.287565"
+    },
+    {
+      "original_filename": "reset_27.mp3",
+      "new_filename": "reset_27_reset_mindset.mp3",
+      "cue_text": "Reset the mindset.",
+      "category": "reset",
+      "emotion": "neutral",
+      "phase": "crisis",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:49:11.616401"
+    },
+    {
+      "original_filename": "reset_28.mp3",
+      "new_filename": "general_28_present_moment_only.mp3",
+      "cue_text": "Present moment only.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:49:24.284279"
+    },
+    {
+      "original_filename": "reset_29.mp3",
+      "new_filename": "general_29_past_future_just_now.mp3",
+      "cue_text": "No past, no future, just now.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:49:38.759670"
+    },
+    {
+      "original_filename": "reset_30.mp3",
+      "new_filename": "reset_30_recenter_intent.mp3",
+      "cue_text": "recenter your intent.",
+      "category": "reset",
+      "emotion": "calming",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:49:49.107395"
+    },
+    {
+      "original_filename": "reset_31.mp3",
+      "new_filename": "reset_31_focus_choice.mp3",
+      "cue_text": "Focus is a choice.",
+      "category": "reset",
+      "emotion": "focused",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:50:02.778042"
+    },
+    {
+      "original_filename": "reset_32.mp3",
+      "new_filename": "general_32_drop_clutter_see_play.mp3",
+      "cue_text": "Drop the clutter, see the play.",
+      "category": "general",
+      "emotion": "neutral",
+      "phase": "any",
+      "source_folder": "reset",
+      "processed_date": "2025-10-21T00:50:14.290911"
+    }
+  ]
+}

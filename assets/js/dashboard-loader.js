@@ -1,0 +1,64 @@
+﻿/*
+  dashboard-loader.js - improved URL resolution for scripts loaded from fetched document
+  - Fetches /dashboard.html and injects #dashboard-container content into host page.
+  - Resolves script URLs relative to the fetched document URL.
+  - Preserves module/type attributes for external scripts. Skips inline scripts (CSP-safe).
+*/
+(async function () {
+  'use strict';
+
+  async function fetchAndInject(url, targetId) {
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, 'text/html');
+
+      const srcEl = doc.getElementById(targetId) || doc.body;
+      const html = srcEl ? srcEl.innerHTML : doc.body.innerHTML;
+
+      const target = document.getElementById(targetId);
+      if (!target) throw new Error(`Target #${targetId} not found on host page`);
+      target.innerHTML = html;
+
+      // Load external scripts found in the fetched document, in order
+      const scripts = Array.from(doc.querySelectorAll('script'));
+      for (const s of scripts) {
+        if (s.src) {
+          // Resolve script URL relative to the fetched document URL
+          let resolved;
+          try {
+            resolved = new URL(s.src, url).href;
+          } catch (e) {
+            resolved = s.src;
+          }
+
+          await new Promise((resolve) => {
+            const tag = document.createElement('script');
+            if (s.type) tag.type = s.type;
+            if (s.defer) tag.defer = true;
+            if (s.module) tag.type = s.type || 'module';
+            if (s.getAttribute('crossorigin')) tag.setAttribute('crossorigin', s.getAttribute('crossorigin'));
+            tag.src = resolved;
+            tag.onload = resolve;
+            tag.onerror = () => { console.warn('Failed to load', tag.src); resolve(); };
+            document.head.appendChild(tag);
+          });
+        } else if (s.textContent && s.textContent.trim()) {
+          // Inline scripts are skipped due to CSP; log so you can externalize them later.
+          console.warn('dashboard-loader: skipped inline script from', url);
+        }
+      }
+    } catch (err) {
+      console.error('dashboard-loader error:', err);
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.innerHTML = `<div class="glass-card p-6 text-center text-red-300">Failed to load dashboard: ${err.message}</div>`;
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchAndInject('/dashboard.html', 'dashboard-container');
+  });
+})();

@@ -1,0 +1,43 @@
+{
+  "strategist": {
+    "lowConfidence": [
+      "assets/audio/tactical/tactical_01.mp3",
+      "assets/audio/tactical/tactical_02.mp3"
+    ],
+    "midConfidence": [
+      "assets/audio/tactical/tactical_10.mp3",
+      "assets/audio/tactical/tactical_11.mp3"
+    ],
+    "highConfidence": [
+      "assets/audio/tactical/tactical_20.mp3",
+      "assets/audio/tactical/tactical_21.mp3"
+    ]
+  },
+  "rebuilder": {
+    "lowConfidence": [
+      "assets/audio/reset/reset_01.mp3",
+      "assets/audio/reset/reset_03.mp3"
+    ],
+    "midConfidence": [
+      "assets/audio/reset/reset_10.mp3",
+      "assets/audio/recovery/recovery_03.mp3"
+    ],
+    "highConfidence": [
+      "assets/audio/recovery/recovery_08.mp3",
+      "assets/audio/recovery/recovery_10.mp3"
+    ]
+  },
+  "improviser": {
+    "lowArousal": [
+      "assets/audio/coach_s_cooldown_quiet.mp3",
+      "assets/audio/coach_s_cooldown_reflect.mp3"
+    ],
+    "midArousal": [
+      "assets/audio/coach_s_celebrate_rhythm.mp3"
+    ],
+    "highArousal": [
+      "assets/audio/coach_s_celebrate_breakthrough.mp3",
+      "assets/audio/coach_s_celebrate_focus.mp3"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "title": "Solar Resilience 60s",
+  "events": [
+    { "delay": 0,  "type": "mp:solar:update", "detail": { "production_mwh": 4.1, "efficiency_pct": 93.5, "p95_latency_ms": 90, "predicted_yield_uplift_pct": 2.1, "baseline_mwh": 4.00, "status": "tracking", "next_adjust": 0 } },
+    { "delay": 10000,  "type": "mp:solar:update", "detail": { "production_mwh": 3.5, "efficiency_pct": 90.2, "p95_latency_ms": 110, "predicted_yield_uplift_pct": 1.4, "baseline_mwh": 3.48, "status": "optimizing", "next_adjust": 0 } },
+    { "delay": 10000,  "type": "mp:solar:update", "detail": { "production_mwh": 3.7, "efficiency_pct": 91.4, "p95_latency_ms": 100, "predicted_yield_uplift_pct": 1.9, "baseline_mwh": 3.55, "status": "optimizing", "next_adjust": 0 } },
+    { "delay": 12000,  "type": "mp:solar:update", "detail": { "production_mwh": 3.9, "efficiency_pct": 92.8, "p95_latency_ms": 92, "predicted_yield_uplift_pct": 2.6, "baseline_mwh": 3.62, "status": "tracking", "next_adjust": 0 } },
+    { "delay": 12000,  "type": "mp:solar:update", "detail": { "production_mwh": 4.2, "efficiency_pct": 94.6, "p95_latency_ms": 80, "predicted_yield_uplift_pct": 3.2, "baseline_mwh": 3.74, "status": "tracking", "next_adjust": 0 } }
+  ]
+}
+
