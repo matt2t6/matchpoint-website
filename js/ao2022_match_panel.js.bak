@@ -1,0 +1,1632 @@
+// ============================================================
+// AO2022 Cinematic Match Panel — MatchPoint Live Demo
+// Court Canvas + Line Calling System + Composure Arc
+// ============================================================
+(function() {
+
+  // ── Narrative Acts ────────────────────────────────────────
+  const ACTS = [
+    { t:0,   label:'ACT I',    title:'Medvedev Dominates',      color:'#0ea5e9' },
+    { t:60,  label:'ACT II',   title:'Crisis — Tiebreak',       color:'#f97316' },
+    { t:160, label:'CRISIS',   title:'Coach Intervention',       color:'#ef4444' },
+    { t:200, label:'ACT III',  title:'The Comeback Begins',     color:'#22c55e' },
+    { t:300, label:'ACT IV',   title:'Champion State',          color:'#eab308' },
+    { t:410, label:'🏆',       title:'Nadal — 21st Grand Slam', color:'#FFD700' },
+  ];
+
+  const COACH_CUES = [
+    { t:0,   cue:"Stay present. This is your moment — trust every shot you've built." },
+    { t:25,  cue:"Track the ball early. His flat ball comes fast — move your feet first." },
+    { t:50,  cue:"Double break means nothing. Win the next game. One game at a time." },
+    { t:80,  cue:"Heavy topspin, stay on the T. Make him move — your forehand is a weapon." },
+    { t:110, cue:"Stay in your routine. Big first serve, go for the wide one." },
+    { t:145, cue:"Look at me. Deep breath. You've been here before. Own the next point." },
+    { t:168, cue:"You have won 20 Slams. You know what to do. Breathe. Trust your hands." },
+    { t:200, cue:"That's the one! Keep the pressure — deeper returns, follow the forehand in." },
+    { t:240, cue:"Textbook. Big serve, net approach — you're dictating the rallies now." },
+    { t:280, cue:"YES. Now we go for two more. Same energy. Stay hungry." },
+    { t:330, cue:"You are the greatest. Leave everything on this court — finish it." },
+    { t:390, cue:"This is what MatchPoint is built for. Every cue. Every second. Right here." },
+    { t:415, cue:"Rafael Nadal. 21. The greatest. MatchPoint was there for every step." },
+  ];
+
+  const COMPOSURE_ARC = [
+    { t:0,   val:74, tier:'STABLE',   color:'#0ea5e9' },
+    { t:40,  val:70, tier:'STABLE',   color:'#0ea5e9' },
+    { t:60,  val:62, tier:'ALERT',    color:'#f97316' },
+    { t:80,  val:65, tier:'STABLE',   color:'#0ea5e9' },
+    { t:110, val:71, tier:'STABLE',   color:'#0ea5e9' },
+    { t:145, val:61, tier:'CRITICAL', color:'#ef4444' },
+    { t:168, val:58, tier:'CRITICAL', color:'#ef4444' },
+    { t:185, val:62, tier:'ALERT',    color:'#f97316' },
+    { t:200, val:72, tier:'STRONG',   color:'#22c55e' },
+    { t:240, val:78, tier:'STRONG',   color:'#22c55e' },
+    { t:280, val:84, tier:'ELITE',    color:'#eab308' },
+    { t:330, val:90, tier:'ELITE',    color:'#eab308' },
+    { t:390, val:95, tier:'ELITE',    color:'#FFD700' },
+    { t:420, val:97, tier:'ELITE',    color:'#FFD700' },
+  ];
+
+  // ── State ─────────────────────────────────────────────────
+  let animFrame = null;
+  let frameIdx = 0;
+  let lastFrameTime = null;
+  let isRunning = false;
+  let shotArcs = [];          // {x1,y1,x2,y2,call,age,id}
+  let heatDots = [];          // {x,y,call,age}
+  let recentCalls = [];       // {call,player,confidence,t,challenged}
+  let lastActIdx = -1;
+  let lastCueIdx = -1;
+  let challengePending = false;
+  let lastBounceFrame = -1;
+  const MAX_ARCS = 12;
+  const MAX_DOTS = 60;
+  const FRAME_MS = 180;
+  const MAX_T = 420;
+
+  // ── Match Audio Engine ─────────────────────────────────────
+  const AUDIO_BASE = '/assets/audio/match';
+  const _audioCache = {};
+  let _crowdLoop = null;
+  let _rallyLoop = null;
+  let _lastShotT = -999;     // prevent shot sound spam
+  let _lastActAudio = -1;    // track which act triggered crowd
+  let _audioUnlocked = false;
+
+  function _getAudio(name) {
+    if (!_audioCache[name]) {
+      const a = new Audio(`${AUDIO_BASE}/${name}.mp3`);
+      a.preload = 'auto';
+      _audioCache[name] = a;
+    }
+    return _audioCache[name];
+  }
+
+  function _unlockAudio() {
+    if (_audioUnlocked) return;
+    _audioUnlocked = true;
+    // Pre-warm all sounds on first user gesture
+    ['ball_hit','forehand','backhand','serve_toss','smash','net',
+     'crowd_noise','rally_loop','applause','applause_big','applause_outro'].forEach(n => {
+      const a = _getAudio(n);
+      a.volume = 0;
+      a.play().then(() => a.pause()).catch(() => {});
+      a.volume = 1;
+    });
+  }
+
+  function _playOnce(name, vol) {
+    try {
+      const a = _getAudio(name);
+      a.currentTime = 0;
+      a.volume = vol !== undefined ? vol : 0.55;
+      a.play().catch(() => {});
+    } catch(e) {}
+  }
+
+  function _startLoop(name, vol) {
+    try {
+      const a = _getAudio(name);
+      a.loop = true;
+      a.volume = vol !== undefined ? vol : 0.18;
+      if (a.paused) a.play().catch(() => {});
+      return a;
+    } catch(e) { return null; }
+  }
+
+  function _stopLoop(audioEl) {
+    if (!audioEl) return;
+    try {
+      audioEl.pause();
+      audioEl.currentTime = 0;
+    } catch(e) {}
+  }
+
+  function _fadeTo(audioEl, targetVol, ms) {
+    if (!audioEl) return;
+    const steps = 20;
+    const interval = ms / steps;
+    const startVol = audioEl.volume;
+    const delta = (targetVol - startVol) / steps;
+    let step = 0;
+    const t = setInterval(() => {
+      step++;
+      audioEl.volume = Math.max(0, Math.min(1, startVol + delta * step));
+      if (step >= steps) {
+        clearInterval(t);
+        if (targetVol === 0) { audioEl.pause(); audioEl.currentTime = 0; }
+      }
+    }, interval);
+  }
+
+  // Called each frame to decide what audio to play
+  function _updateMatchAudio(frame, isBounce, prevFrame) {
+    const t = frame.t;
+    const spd = frame.spd || 120;
+    const rpm = frame.rpm || 2500;
+
+    // ── Crowd ambient loop: starts on first frame, fades with act ──
+    if (!_crowdLoop) {
+      _crowdLoop = _startLoop('crowd_noise', 0.12);
+    }
+
+    // ── Act-based crowd swell ──
+    const actIdx = ACTS.reduce((best, a, i) => t >= a.t ? i : best, 0);
+    if (actIdx !== _lastActAudio) {
+      _lastActAudio = actIdx;
+      if (actIdx === 2) { // CRISIS
+        _fadeTo(_crowdLoop, 0.22, 1200);
+      } else if (actIdx === 5) { // FINALE 🏆
+        _stopLoop(_rallyLoop); _rallyLoop = null;
+        _fadeTo(_crowdLoop, 0.0, 800);
+        setTimeout(() => _playOnce('applause_big', 0.65), 400);
+        setTimeout(() => _playOnce('applause_outro', 0.55), 4000);
+      } else if (actIdx === 3) { // Comeback
+        _fadeTo(_crowdLoop, 0.15, 1000);
+        setTimeout(() => _playOnce('applause', 0.45), 600);
+      } else if (actIdx === 4) { // Champion State
+        _fadeTo(_crowdLoop, 0.18, 800);
+        setTimeout(() => _playOnce('applause', 0.5), 200);
+      }
+    }
+
+    // ── Rally loop: play during active rallies, stop between points ──
+    if (frame.rc && frame.rc > 4) {
+      if (!_rallyLoop) {
+        _rallyLoop = _startLoop('rally_loop', 0.10);
+      }
+    } else {
+      if (_rallyLoop && !_rallyLoop.paused) {
+        _fadeTo(_rallyLoop, 0, 600);
+        _rallyLoop = null;
+      }
+    }
+
+    // ── Shot sounds on bounce (throttle: min 0.4s between shots) ──
+    if (isBounce && (t - _lastShotT) > 0.4) {
+      _lastShotT = t;
+      // Pick shot type by speed + spin profile
+      if (spd > 140) {
+        _playOnce('smash', 0.6);              // high-speed smash
+      } else if (rpm > 3000) {
+        _playOnce('forehand', 0.5);           // high-spin = heavy forehand topspin
+      } else if (rpm < 2400) {
+        _playOnce('backhand', 0.45);          // low spin = slice backhand
+      } else if (frame.call === 'OUT') {
+        _playOnce('net', 0.5);               // net/out call
+      } else {
+        _playOnce('ball_hit', 0.45);          // generic clean hit
+      }
+    }
+
+    // ── Serve toss: play near start and at key serve points (momentum low) ──
+    if ((t < 2 && t > 0.1) || (frame.mom < 15 && t > 10 && (t - _lastShotT) > 3)) {
+      if (t < 1.5 || (frame.mom < 15 && (t - _lastShotT) > 3)) {
+        // Only fire once per serve window
+        if (!_audioCache['_serveFired_' + Math.floor(t)]) {
+          _audioCache['_serveFired_' + Math.floor(t)] = true;
+          _playOnce('serve_toss', 0.4);
+        }
+      }
+    }
+  }
+
+  function _stopAllMatchAudio() {
+    _stopLoop(_crowdLoop); _crowdLoop = null;
+    _stopLoop(_rallyLoop); _rallyLoop = null;
+    _lastShotT = -999;
+    _lastActAudio = -1;
+    // Clear serve fire cache
+    Object.keys(_audioCache).filter(k => k.startsWith('_serveFired_'))
+      .forEach(k => delete _audioCache[k]);
+  }
+
+  // ── EMA smoothing state for metrics (prevents squirrelly jumps) ──
+  // α = smoothing factor: lower = smoother, higher = more responsive
+  const EMA_SPD  = 0.18;  // speed — medium responsiveness
+  const EMA_RPM  = 0.14;  // spin — slightly slower
+  const EMA_CONF = 0.08;  // confidence — very stable, only shifts on events
+  const EMA_COV  = 0.06;  // court coverage — slow drift metric
+  const EMA_LAT  = 0.04;  // latency — near-static with rare micro-spikes
+  const EMA_ACC  = 0.05;  // accuracy — near-static
+  let ema = { spd: 120, rpm: 2600, conf: 97, cov: 42, lat: 2.8, acc: 3.7 };
+  let lastConfOnBounce = 97; // confidence only meaningfully updates on bounce events
+
+  // ── Game Metrics session trackers ──
+  const gs = {
+    maxServeMph:   132,   // max serve speed seen this session
+    longestRally:  0,     // longest rally in shots
+    rallySum:      0,     // sum of all rally lengths (for avg)
+    rallyCount:    0,     // number of rallies counted
+    prevRc:        0,     // previous frame rc (rally counter)
+    totalDistKm:   0,     // accumulated court distance
+    prevCovPct:    42,    // previous coverage % (for distance delta)
+    bestReaction:  0.20,  // best reaction time seen
+    last10:        [],    // last 10 shot confidence values (for hit/miss)
+    shotCount:     0,     // total shots for react time oscillation
+  };
+
+  // ── Court geometry helpers ────────────────────────────────
+  // Canvas is 280 wide x 420 tall (portrait, like real court view)
+  const CW = 280, CH = 420;
+  const COURT = {
+    mx: 40, my: 30,
+    get w() { return CW - this.mx*2; },
+    get h() { return CH - this.my*2; },
+    get netY() { return this.my + this.h/2; }
+  };
+
+  function dataToCanvas(x, y) {
+    // x: 0-1 (left-right), y: 0.706-0.980 (remapped to full court)
+    const yn = (y - 0.706) / (0.980 - 0.706);
+    return {
+      cx: COURT.mx + x * COURT.w,
+      cy: COURT.my + yn * COURT.h
+    };
+  }
+
+  // ── Build Panel HTML ──────────────────────────────────────
+  function buildPanel() {
+    const container = document.getElementById('ao2022-match-panel');
+    if (!container) return;
+
+    container.innerHTML = `
+    <style>
+      #ao2022-match-panel {
+        background: linear-gradient(135deg, rgba(6,10,22,0.98) 0%, rgba(10,16,30,0.98) 50%, rgba(6,12,26,0.98) 100%);
+        border: 1px solid rgba(0,245,212,0.25);
+        border-radius: 16px;
+        overflow: hidden;
+        font-family: 'Inter', 'DM Sans', system-ui, sans-serif;
+        user-select: none;
+        box-shadow: 0 0 0 1px rgba(0,245,212,0.06), 0 8px 40px rgba(0,0,0,0.7), 0 0 60px rgba(0,245,212,0.06), inset 0 1px 0 rgba(255,255,255,0.04);
+        position: relative;
+      }
+      #ao2022-match-panel::before {
+        content:'';
+        position:absolute;top:0;left:0;right:0;height:1px;
+        background: linear-gradient(90deg, transparent 0%, rgba(0,245,212,0.5) 30%, rgba(14,165,233,0.6) 60%, transparent 100%);
+        pointer-events:none;z-index:1;
+      }
+      .mp-header {
+        display:flex; align-items:center; justify-content:space-between;
+        padding:0.6rem 1.1rem;
+        background: linear-gradient(90deg, rgba(2,6,18,0.99) 0%, rgba(4,10,26,0.98) 50%, rgba(2,6,18,0.99) 100%);
+        border-bottom:1px solid rgba(0,245,212,0.12);
+        position:relative;z-index:2;
+        backdrop-filter:blur(12px);
+      }
+      .mp-header::after {
+        content:'';
+        position:absolute;bottom:0;left:5%;right:5%;height:1px;
+        background:linear-gradient(90deg,transparent,rgba(0,245,212,0.3),transparent);
+        pointer-events:none;
+      }
+      .mp-live-dot {
+        width:7px;height:7px;border-radius:50%;background:#ef4444;
+        box-shadow:0 0 10px rgba(239,68,68,0.9), 0 0 20px rgba(239,68,68,0.4);
+        animation:mp-pulse 1.2s infinite;
+      }
+      @keyframes mp-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+      @keyframes mp-flash { 0%{background:rgba(0,245,212,0.3)} 100%{background:transparent} }
+      .mp-main-grid {
+        display:grid;
+        grid-template-columns:280px 1fr 150px;
+        min-height:0;
+      }
+      /* Court panel */
+      .mp-court-panel {
+        position:relative;
+        background: radial-gradient(ellipse at 50% 50%, #0e2414 0%, #081509 60%, #050d06 100%);
+        border-right:1px solid rgba(0,245,212,0.12);
+        box-shadow: inset -8px 0 24px rgba(0,0,0,0.5);
+      }
+      #ao22-court-canvas { display:block; }
+      .mp-call-flash {
+        position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+        font-size:2.5rem;font-weight:900;letter-spacing:0.1em;
+        pointer-events:none;opacity:0;transition:opacity 0.3s;
+        text-shadow:0 0 20px currentColor;
+      }
+      /* Centre: LCS + scoreboard */
+      .mp-centre {
+        display:flex;flex-direction:column;
+        background: linear-gradient(180deg, rgba(4,10,24,0.99) 0%, rgba(6,14,30,0.99) 100%);
+        padding:0.45rem 0.6rem;
+        gap:0.3rem;
+        overflow:hidden;
+      }
+      .mp-lcs-title {
+        font-size:0.58rem;font-weight:800;letter-spacing:0.15em;
+        color:#00f5d4;text-transform:uppercase;margin-bottom:0.35rem;
+        text-shadow:0 0 12px rgba(0,245,212,0.6);
+      }
+      .mp-metrics-row {
+        display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.25rem;
+        margin-bottom:0.3rem;
+      }
+      .mp-metric {
+        background: linear-gradient(135deg, rgba(0,245,212,0.07) 0%, rgba(14,165,233,0.04) 100%);
+        border:1px solid rgba(0,245,212,0.18);
+        border-radius:7px;padding:0.22rem 0.3rem;text-align:center;
+        box-shadow:0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+        transition:border-color 0.2s, box-shadow 0.2s;
+      }
+      .mp-metric:hover {
+        border-color:rgba(0,245,212,0.35);
+        box-shadow:0 2px 12px rgba(0,245,212,0.15);
+      }
+      .mp-metric-val { font-size:0.88rem;font-weight:800;color:#00f5d4;line-height:1;text-shadow:0 0 8px rgba(0,245,212,0.5); }
+      .mp-metric-label { font-size:0.48rem;text-transform:uppercase;letter-spacing:0.08em;color:#475569;margin-top:2px; }
+      /* Call buttons */
+      .mp-call-buttons {
+        display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.4rem;margin-bottom:0.4rem;
+      }
+      @keyframes mp-call-fire {
+        0%   { transform:scale(1); }
+        20%  { transform:scale(0.93); }
+        45%  { transform:scale(1.06); box-shadow:0 0 22px var(--call-glow-color,rgba(255,255,255,0.5)); }
+        100% { transform:scale(1); }
+      }
+      .mp-call-btn {
+        padding:0.32rem 0.2rem;border-radius:8px;border:1.5px solid;
+        font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
+        cursor:pointer;transition:all 0.18s cubic-bezier(0.4,0,0.2,1);text-align:center;
+        background: linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(10,16,32,0.5) 100%);
+        position:relative;overflow:hidden;
+        box-shadow:0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+      }
+      .mp-call-btn::before {
+        content:'';position:absolute;inset:0;
+        background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 60%);
+        border-radius:inherit;pointer-events:none;
+      }
+      .mp-call-btn:active { transform:scale(0.93); }
+      .mp-call-btn.firing { animation:mp-call-fire 0.35s ease-out forwards; }
+      .mp-call-btn.in  { border-color:rgba(34,197,94,0.7);color:#22c55e;--call-glow-color:rgba(34,197,94,0.6); }
+      .mp-call-btn.in:hover  { background:linear-gradient(135deg,rgba(34,197,94,0.22) 0%,rgba(34,197,94,0.08) 100%);box-shadow:0 0 16px rgba(34,197,94,0.35),0 2px 6px rgba(0,0,0,0.4);border-color:#22c55e; }
+      .mp-call-btn.in.active  { background:linear-gradient(135deg,rgba(34,197,94,0.3) 0%,rgba(34,197,94,0.12) 100%);box-shadow:0 0 24px rgba(34,197,94,0.5); }
+      .mp-call-btn.out { border-color:rgba(239,68,68,0.7);color:#ef4444;--call-glow-color:rgba(239,68,68,0.6); }
+      .mp-call-btn.out:hover { background:linear-gradient(135deg,rgba(239,68,68,0.22) 0%,rgba(239,68,68,0.08) 100%);box-shadow:0 0 16px rgba(239,68,68,0.35),0 2px 6px rgba(0,0,0,0.4);border-color:#ef4444; }
+      .mp-call-btn.out.active { background:linear-gradient(135deg,rgba(239,68,68,0.3) 0%,rgba(239,68,68,0.12) 100%);box-shadow:0 0 24px rgba(239,68,68,0.5); }
+      .mp-call-btn.let { border-color:rgba(234,179,8,0.7);color:#eab308;--call-glow-color:rgba(234,179,8,0.6); }
+      .mp-call-btn.let:hover { background:linear-gradient(135deg,rgba(234,179,8,0.22) 0%,rgba(234,179,8,0.08) 100%);box-shadow:0 0 16px rgba(234,179,8,0.35),0 2px 6px rgba(0,0,0,0.4);border-color:#eab308; }
+      .mp-call-btn.let.active { background:linear-gradient(135deg,rgba(234,179,8,0.3) 0%,rgba(234,179,8,0.12) 100%);box-shadow:0 0 24px rgba(234,179,8,0.5); }
+      .mp-call-btn.fault { border-color:rgba(249,115,22,0.7);color:#f97316;--call-glow-color:rgba(249,115,22,0.5); }
+      .mp-call-btn.fault:hover { background:linear-gradient(135deg,rgba(249,115,22,0.2) 0%,rgba(249,115,22,0.07) 100%);box-shadow:0 0 14px rgba(249,115,22,0.35);border-color:#f97316; }
+      .mp-call-btn.fault.active { background:linear-gradient(135deg,rgba(249,115,22,0.28) 0%,rgba(249,115,22,0.1) 100%);box-shadow:0 0 20px rgba(249,115,22,0.45); }
+      .mp-call-btn.challenge { border-color:rgba(167,139,250,0.65);color:#a78bfa;grid-column:1/-1;--call-glow-color:rgba(167,139,250,0.6); }
+      .mp-call-btn.challenge:hover { background:linear-gradient(135deg,rgba(167,139,250,0.2) 0%,rgba(167,139,250,0.07) 100%);box-shadow:0 0 18px rgba(167,139,250,0.4);border-color:#a78bfa; }
+      .mp-call-btn.challenge.active { background:linear-gradient(135deg,rgba(167,139,250,0.28) 0%,rgba(167,139,250,0.1) 100%);box-shadow:0 0 26px rgba(167,139,250,0.5); }
+      /* Recent calls */
+      .mp-recent-title {
+        font-size:0.52rem;font-weight:700;letter-spacing:0.1em;
+        color:#475569;text-transform:uppercase;margin-bottom:0.3rem;
+      }
+      .mp-recent-list { display:flex;flex-direction:column;gap:0.15rem;max-height:60px;overflow-y:auto; }
+      .mp-recent-item {
+        display:flex;align-items:center;justify-content:space-between;
+        padding:0.2rem 0.45rem;border-radius:6px;
+        background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);
+        border:1px solid rgba(255,255,255,0.06);
+        font-size:0.58rem;
+        animation:mp-flash 0.4s ease-out;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);
+      }
+      .mp-recent-call { font-weight:800;letter-spacing:0.06em; }
+      .mp-recent-call.IN { color:#22c55e; }
+      .mp-recent-call.OUT { color:#ef4444; }
+      .mp-recent-call.LET { color:#eab308; }
+      .mp-recent-call.FAULT { color:#f97316; }
+      /* Scoreboard */
+      .mp-scoreboard {
+        background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(4,10,24,0.6) 100%);
+        border:1px solid rgba(0,245,212,0.18);
+        border-radius:10px;padding:0.35rem 0.45rem;
+        box-shadow:0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04), 0 0 20px rgba(0,245,212,0.06);
+        position:relative;overflow:hidden;
+      }
+      .mp-scoreboard::before {
+        content:'';position:absolute;top:0;left:0;right:0;height:1px;
+        background:linear-gradient(90deg,transparent,rgba(0,245,212,0.4),transparent);
+        pointer-events:none;
+      }
+      .mp-sb-row {
+        display:grid;grid-template-columns:1fr repeat(5,22px) 30px;
+        gap:3px;align-items:center;padding:0.25rem 0;
+      }
+      .mp-sb-row + .mp-sb-row { border-top:1px solid rgba(255,255,255,0.05); }
+      .mp-sb-player { font-size:0.65rem;font-weight:700;color:#e2e8f0; }
+      .mp-sb-set {
+        font-size:0.65rem;font-weight:700;text-align:center;
+        padding:1px 3px;border-radius:4px;color:#475569;
+        min-width:20px;transition:all 0.3s;
+      }
+      .mp-sb-set.won { color:#00f5d4;background:rgba(0,245,212,0.15);box-shadow:0 0 6px rgba(0,245,212,0.25); }
+      .mp-sb-set.losing { color:#ef4444; }
+      .mp-sb-pts { font-size:0.85rem;font-weight:800;color:#00f5d4;text-align:center; }
+      /* Momentum */
+      .mp-mom-bar-track {
+        height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;margin-top:3px;
+      }
+      .mp-mom-bar-fill {
+        height:100%;border-radius:2px;
+        background:linear-gradient(90deg,#0ea5e9,#00f5d4,#a78bfa);
+        transition:width 0.5s,background 0.5s;
+        box-shadow:0 0 4px rgba(0,245,212,0.4);
+      }
+      /* Challenge overlay */
+      #ao22-challenge-overlay {
+        display:none;position:absolute;inset:0;
+        background:rgba(2,6,18,0.92);z-index:10;
+        align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;
+        border-radius:14px 0 0 14px;
+      }
+      #ao22-challenge-overlay.active { display:flex; }
+      .mp-review-ring {
+        width:80px;height:80px;border-radius:50%;
+        border:3px solid rgba(167,139,250,0.3);
+        border-top-color:#a78bfa;
+        animation:mp-spin 0.8s linear infinite;
+      }
+      @keyframes mp-spin { to{transform:rotate(360deg)} }
+      /* Right: Composure */
+      .mp-composure-panel {
+        background: linear-gradient(180deg, rgba(4,10,26,0.99) 0%, rgba(6,14,32,0.98) 100%);
+        border-left:1px solid rgba(0,245,212,0.12);
+        padding:0.45rem 0.5rem;
+        display:flex;flex-direction:column;gap:0.25rem;
+        overflow:hidden;
+        box-shadow:inset 8px 0 24px rgba(0,0,0,0.4);
+      }
+      .mp-composure-title {
+        font-size:0.52rem;font-weight:800;letter-spacing:0.12em;color:#334155;text-transform:uppercase;
+        display:flex;align-items:center;gap:0.3rem;
+      }
+      .mp-composure-title::before {
+        content:'';
+        display:inline-block;width:12px;height:1px;
+        background:linear-gradient(90deg,rgba(0,245,212,0.6),transparent);
+      }
+      #ao22-composure-canvas { width:100%;min-height:0;height:90px; }
+      .mp-tier-badge {
+        font-size:0.58rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
+        padding:3px 10px;border-radius:20px;display:inline-block;text-align:center;
+        transition:all 0.5s;
+        box-shadow:0 2px 8px rgba(0,0,0,0.3);
+      }
+      /* ── Game Metrics grid ── */
+      .mp-stats-grid {
+        display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;
+        margin:0.35rem 0;
+      }
+      .mp-stat-card {
+        background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,rgba(0,0,0,0.2) 100%);
+        border:1px solid rgba(255,255,255,0.07);
+        border-radius:7px;padding:0.28rem 0.35rem;
+        position:relative;overflow:hidden;
+        transition:border-color 0.2s;
+      }
+      .mp-stat-card::before {
+        content:'';position:absolute;top:0;left:0;right:0;height:1px;
+        background:var(--sc,rgba(0,245,212,0.25));pointer-events:none;
+      }
+      .mp-stat-card:hover { border-color:rgba(255,255,255,0.14); }
+      .mp-stat-label {
+        font-size:0.42rem;font-weight:700;letter-spacing:0.1em;
+        text-transform:uppercase;color:#334155;margin-bottom:0.12rem;
+        display:flex;align-items:center;gap:0.2rem;
+      }
+      .mp-stat-val {
+        font-size:0.82rem;font-weight:800;line-height:1;
+        color:var(--sc-text,#00f5d4);
+        text-shadow:0 0 8px var(--sc-glow,rgba(0,245,212,0.35));
+      }
+      .mp-stat-unit {
+        font-size:0.42rem;font-weight:600;color:#475569;margin-left:1px;
+      }
+      .mp-stat-sub {
+        font-size:0.42rem;color:#334155;margin-top:0.1rem;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      }
+      .mp-intervene-flag {
+        font-size:0.52rem;font-weight:700;color:#ef4444;
+        padding:0.25rem 0.4rem;border-radius:5px;
+        background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);
+        text-align:center;opacity:0;transition:opacity 0.5s;
+      }
+      /* Coach cue */
+      .mp-coach-box {
+        background:linear-gradient(135deg,rgba(0,245,212,0.06) 0%,rgba(14,165,233,0.03) 100%);
+        border:1px solid rgba(0,245,212,0.2);
+        border-radius:8px;padding:0.35rem 0.45rem;
+        box-shadow:0 0 12px rgba(0,245,212,0.08),inset 0 1px 0 rgba(255,255,255,0.04);
+      }
+      .mp-coach-label {
+        font-size:0.5rem;font-weight:800;letter-spacing:0.12em;color:#00f5d4;
+        text-transform:uppercase;margin-bottom:0.3rem;
+        text-shadow:0 0 8px rgba(0,245,212,0.5);
+      }
+      #ao22-coach-cue {
+        font-size:0.65rem;color:#e2e8f0;line-height:1.4;font-style:italic;
+        min-height:32px;transition:opacity 0.4s;
+      }
+      /* Act banner */
+      .mp-act-banner {
+        display:flex;align-items:center;gap:0.4rem;
+        padding:0.22rem 0.45rem;border-radius:7px;
+        background:linear-gradient(135deg,rgba(14,165,233,0.12) 0%,rgba(14,165,233,0.05) 100%);
+        border:1px solid rgba(14,165,233,0.3);
+        transition:all 0.4s;
+        box-shadow:0 0 10px rgba(14,165,233,0.1),inset 0 1px 0 rgba(255,255,255,0.03);
+      }
+      #ao22-act-label { font-size:0.52rem;font-weight:800;letter-spacing:0.15em;text-transform:uppercase; }
+      #ao22-act-title { font-size:0.68rem;font-weight:600;color:#e2e8f0; }
+      /* Progress */
+      .mp-progress-strip {
+        padding:0.45rem 0.85rem 0.55rem;
+        background: linear-gradient(90deg, rgba(2,6,18,0.99) 0%, rgba(4,10,24,0.98) 50%, rgba(2,6,18,0.99) 100%);
+        border-top:1px solid rgba(0,245,212,0.08);
+      }
+      .mp-progress-track {
+        height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;margin-bottom:4px;
+      }
+      #ao22-progress-fill {
+        height:100%;width:0%;border-radius:2px;
+        background:linear-gradient(90deg,#0ea5e9 0%,#00f5d4 40%,#eab308 80%,#FFD700 100%);
+        transition:width 0.2s;
+      }
+      .mp-act-markers {
+        display:flex;justify-content:space-between;
+        font-size:0.48rem;color:#475569;letter-spacing:0.05em;font-weight:600;
+      }
+    </style>
+
+    <!-- HEADER -->
+    <div class="mp-header">
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <div class="mp-live-dot"></div>
+        <span style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;color:#ef4444;text-transform:uppercase;">Live Tracking</span>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;color:#e2e8f0;">2022 Australian Open Final</div>
+        <div style="font-size:0.5rem;color:#475569;letter-spacing:0.06em;">Nadal vs Medvedev · Rod Laver Arena</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.35rem;">
+        <div style="width:5px;height:5px;border-radius:50%;background:#00f5d4;"></div>
+        <span style="font-size:0.52rem;color:#00f5d4;letter-spacing:0.06em;">MatchPoint ELC v1</span>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="mp-main-grid">
+
+      <!-- LEFT: Court Canvas -->
+      <div class="mp-court-panel">
+        <canvas id="ao22-court-canvas" width="${CW}" height="${CH}" style="display:block;width:${CW}px;height:${CH}px;"></canvas>
+        <div id="ao22-call-flash" class="mp-call-flash"></div>
+        <!-- Challenge overlay -->
+        <div id="ao22-challenge-overlay">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;color:#a78bfa;text-transform:uppercase;margin-bottom:0.5rem;">Reviewing Call...</div>
+          <div class="mp-review-ring"></div>
+          <div id="ao22-review-result" style="font-size:1.4rem;font-weight:900;letter-spacing:0.12em;margin-top:0.75rem;display:none;"></div>
+        </div>
+      </div>
+
+      <!-- CENTRE: Line Calling System + Scoreboard -->
+      <div class="mp-centre">
+
+        <!-- LCS header & metrics -->
+        <div>
+          <div class="mp-lcs-title">⚡ Line Calling System</div>
+          <div class="mp-metrics-row">
+            <div class="mp-metric">
+              <div class="mp-metric-val" id="lcs-accuracy">4.8mm</div>
+              <div class="mp-metric-label">Accuracy</div>
+            </div>
+            <div class="mp-metric">
+              <div class="mp-metric-val" id="lcs-latency">3ms</div>
+              <div class="mp-metric-label">Latency</div>
+            </div>
+            <div class="mp-metric">
+              <div class="mp-metric-val" id="lcs-confidence">97.8%</div>
+              <div class="mp-metric-label">AI Confidence</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary call buttons: IN / OUT / LET -->
+        <div class="mp-call-buttons">
+          <button class="mp-call-btn in"    onclick="window.AO2022MatchPanel.manualCall('IN')">IN</button>
+          <button class="mp-call-btn out"   onclick="window.AO2022MatchPanel.manualCall('OUT')">OUT</button>
+          <button class="mp-call-btn let"   onclick="window.AO2022MatchPanel.manualCall('LET')">LET</button>
+          <button class="mp-call-btn fault" onclick="window.AO2022MatchPanel.manualCall('FAULT')">FAULT</button>
+          <button class="mp-call-btn let"   onclick="window.AO2022MatchPanel.manualCall('LST')">LST</button>
+          <button class="mp-call-btn out"   onclick="window.AO2022MatchPanel.manualCall('FAULT')">SMASH</button>
+          <button class="mp-call-btn challenge" onclick="window.AO2022MatchPanel.triggerChallenge()">⚖ CHALLENGE REVIEW</button>
+        </div>
+
+        <!-- Recent Calls -->
+        <div>
+          <div class="mp-recent-title">Recent Calls</div>
+          <div class="mp-recent-list" id="ao22-recent-calls">
+            <div class="mp-recent-item">
+              <span class="mp-recent-call IN">IN</span>
+              <span style="color:#64748b;font-size:0.55rem;">Nadal serve</span>
+              <span style="color:#475569;">99.1%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scoreboard -->
+        <div class="mp-scoreboard">
+          <div style="font-size:0.52rem;font-weight:700;letter-spacing:0.1em;color:#64748b;text-transform:uppercase;margin-bottom:0.35rem;">Match Score</div>
+          <!-- Header row -->
+          <div style="display:grid;grid-template-columns:1fr repeat(5,22px) 30px;gap:3px;margin-bottom:2px;">
+            <div style="font-size:0.45rem;color:#334155;"></div>
+            <div style="font-size:0.5rem;color:#64748b;text-align:center;font-weight:600;">S1</div>
+            <div style="font-size:0.5rem;color:#64748b;text-align:center;font-weight:600;">S2</div>
+            <div style="font-size:0.5rem;color:#64748b;text-align:center;font-weight:600;">S3</div>
+            <div style="font-size:0.5rem;color:#64748b;text-align:center;font-weight:600;">S4</div>
+            <div style="font-size:0.5rem;color:#64748b;text-align:center;font-weight:600;">S5</div>
+            <div style="font-size:0.5rem;color:#64748b;text-align:center;font-weight:600;">Gm</div>
+          </div>
+          <div class="mp-sb-row">
+            <div class="mp-sb-player">🇪🇸 Nadal</div>
+            <div class="mp-sb-set" id="sb-n-s1">0</div>
+            <div class="mp-sb-set" id="sb-n-s2">—</div>
+            <div class="mp-sb-set" id="sb-n-s3">—</div>
+            <div class="mp-sb-set" id="sb-n-s4">—</div>
+            <div class="mp-sb-set" id="sb-n-s5">—</div>
+            <div class="mp-sb-pts" id="sb-n-pts">0</div>
+          </div>
+          <div class="mp-sb-row">
+            <div class="mp-sb-player">🇷🇺 Medvedev</div>
+            <div class="mp-sb-set" id="sb-m-s1">0</div>
+            <div class="mp-sb-set" id="sb-m-s2">—</div>
+            <div class="mp-sb-set" id="sb-m-s3">—</div>
+            <div class="mp-sb-set" id="sb-m-s4">—</div>
+            <div class="mp-sb-set" id="sb-m-s5">—</div>
+            <div class="mp-sb-pts" id="sb-m-pts" style="color:#94a3b8;">0</div>
+          </div>
+        </div>
+
+        <!-- Momentum -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+            <span style="font-size:0.48rem;color:#475569;text-transform:uppercase;letter-spacing:0.04em;">Momentum — Nadal</span>
+            <span id="ao22-mom-val" style="font-size:0.55rem;font-weight:700;color:#00f5d4;">26</span>
+          </div>
+          <div class="mp-mom-bar-track">
+            <div class="mp-mom-bar-fill" id="ao22-mom-bar" style="width:26%;"></div>
+          </div>
+        </div>
+
+        <!-- Act Banner -->
+        <div class="mp-act-banner" id="ao22-act-banner">
+          <span id="ao22-act-label" style="color:#0ea5e9;">ACT I</span>
+          <span id="ao22-act-title">Medvedev Dominates</span>
+        </div>
+
+        <!-- Coach Cue -->
+        <div class="mp-coach-box">
+          <div class="mp-coach-label">🎧 AI Coach Cue · Earbud Delivery</div>
+          <div id="ao22-coach-cue">"Stay present. This is your moment — trust every shot you've built."</div>
+          <div style="display:flex;align-items:center;gap:0.3rem;margin-top:0.35rem;">
+            <div style="width:4px;height:4px;border-radius:50%;background:#00f5d4;animation:mp-pulse 1.5s infinite;"></div>
+            <span style="font-size:0.5rem;color:#475569;letter-spacing:0.05em;">sub-200ms · Adam voice · ElevenLabs</span>
+          </div>
+        </div>
+
+      </div><!-- /centre -->
+
+      <!-- RIGHT: Composure Arc -->
+      <div class="mp-composure-panel">
+        <div class="mp-composure-title">Composure Arc</div>
+        <canvas id="ao22-composure-canvas" width="140" height="90"></canvas>
+        <div style="text-align:center;margin-top:0.25rem;">
+          <div id="ao22-tier-badge" class="mp-tier-badge" style="color:#0ea5e9;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.3);">STABLE</div>
+          <div id="ao22-composure-val" style="font-size:1.5rem;font-weight:800;color:#e2e8f0;margin:0.2rem 0 0;line-height:1;">74</div>
+          <div style="font-size:0.48rem;color:#334155;text-transform:uppercase;letter-spacing:0.06em;">composure index</div>
+        </div>
+        <div id="ao22-intervene-flag" class="mp-intervene-flag">⚠ COACH INTERVENED</div>
+
+        <!-- ── Game Metrics 2×3 Grid ── -->
+        <div class="mp-stats-grid">
+
+          <!-- Serve Speed -->
+          <div class="mp-stat-card" style="--sc:rgba(0,245,212,0.3);--sc-text:#00f5d4;--sc-glow:rgba(0,245,212,0.4);">
+            <div class="mp-stat-label">Serve Speed</div>
+            <div><span class="mp-stat-val" id="gs-serve-speed">119</span><span class="mp-stat-unit">mph</span></div>
+            <div class="mp-stat-sub" id="gs-serve-max">Max: 132 mph</div>
+          </div>
+
+          <!-- Ball Spin -->
+          <div class="mp-stat-card" style="--sc:rgba(167,139,250,0.3);--sc-text:#a78bfa;--sc-glow:rgba(167,139,250,0.4);">
+            <div class="mp-stat-label">Ball Spin</div>
+            <div><span class="mp-stat-val" id="gs-spin">2,730</span><span class="mp-stat-unit">rpm</span></div>
+            <div class="mp-stat-sub" id="gs-spin-type">Type: Topspin</div>
+          </div>
+
+          <!-- Shot Accuracy -->
+          <div class="mp-stat-card" style="--sc:rgba(34,197,94,0.3);--sc-text:#22c55e;--sc-glow:rgba(34,197,94,0.35);">
+            <div class="mp-stat-label">Shot Accuracy</div>
+            <div><span class="mp-stat-val" id="gs-accuracy">89</span><span class="mp-stat-unit">%</span></div>
+            <div class="mp-stat-sub" id="gs-accuracy-sub">Last 10: 10/10</div>
+          </div>
+
+          <!-- Court Coverage -->
+          <div class="mp-stat-card" style="--sc:rgba(14,165,233,0.3);--sc-text:#0ea5e9;--sc-glow:rgba(14,165,233,0.35);">
+            <div class="mp-stat-label">Court Coverage</div>
+            <div><span class="mp-stat-val" id="gs-coverage">77</span><span class="mp-stat-unit">%</span></div>
+            <div class="mp-stat-sub" id="gs-coverage-sub">Distance: 0.9 km</div>
+          </div>
+
+          <!-- Reaction Time -->
+          <div class="mp-stat-card" style="--sc:rgba(249,115,22,0.3);--sc-text:#f97316;--sc-glow:rgba(249,115,22,0.35);">
+            <div class="mp-stat-label">Reaction Time</div>
+            <div><span class="mp-stat-val" id="gs-reaction">0.45</span><span class="mp-stat-unit">s</span></div>
+            <div class="mp-stat-sub" id="gs-reaction-sub">Best: 0.20s</div>
+          </div>
+
+          <!-- Rally Stats -->
+          <div class="mp-stat-card" style="--sc:rgba(234,179,8,0.3);--sc-text:#eab308;--sc-glow:rgba(234,179,8,0.35);">
+            <div class="mp-stat-label">Rally Stats</div>
+            <div><span class="mp-stat-val" id="gs-rally-avg">9.9</span><span class="mp-stat-unit">avg</span></div>
+            <div class="mp-stat-sub" id="gs-rally-longest">Longest: 20 shots</div>
+          </div>
+
+        </div><!-- /mp-stats-grid -->
+
+        <!-- Ball speed + spin inline chips -->
+        <div style="margin-top:auto;padding-top:0.4rem;border-top:1px solid rgba(255,255,255,0.05);display:flex;gap:0.4rem;">
+          <div style="flex:1;background:rgba(0,245,212,0.05);border:1px solid rgba(0,245,212,0.1);border-radius:5px;padding:0.25rem 0.35rem;text-align:center;">
+            <div style="font-size:0.45rem;color:#475569;text-transform:uppercase;letter-spacing:0.05em;">Speed</div>
+            <div id="ao22-speed" style="font-size:0.9rem;font-weight:800;color:#00f5d4;line-height:1;">113</div>
+            <div style="font-size:0.42rem;color:#334155;">km/h</div>
+          </div>
+          <div style="flex:1;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:5px;padding:0.25rem 0.35rem;text-align:center;">
+            <div style="font-size:0.45rem;color:#475569;text-transform:uppercase;letter-spacing:0.05em;">Spin</div>
+            <div id="ao22-rpm" style="font-size:0.9rem;font-weight:800;color:#a78bfa;line-height:1;">2,474</div>
+            <div style="font-size:0.42rem;color:#334155;">rpm</div>
+          </div>
+        </div>
+        <div id="ao22-log" style="display:none;"></div>
+      </div>
+
+    </div><!-- /main-grid -->
+
+    <!-- PROGRESS STRIP -->
+    <div class="mp-progress-strip">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+        <span style="font-size:0.48rem;color:#475569;" id="ao22-time-label">0:00</span>
+        <span style="font-size:0.48rem;color:#334155;">7:00 · 5 Sets</span>
+      </div>
+      <div class="mp-progress-track">
+        <div id="ao22-progress-fill"></div>
+      </div>
+      <div class="mp-act-markers">
+        <span style="color:#0ea5e9;">▸ ACT I</span>
+        <span style="color:#f97316;">▸ CRISIS</span>
+        <span style="color:#22c55e;">▸ COMEBACK</span>
+        <span style="color:#eab308;">▸ CHAMPION</span>
+        <span style="color:#FFD700;">🏆</span>
+      </div>
+    </div>
+    `;
+
+    drawCourt();
+    initComposureChart();
+  }
+
+  // ── Court Drawing ─────────────────────────────────────────
+  function drawCourt() {
+    const canvas = document.getElementById('ao22-court-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    renderCourtFrame(ctx);
+  }
+
+  function renderCourtFrame(ctx) {
+    const W = CW, H = CH;
+    const { mx, my, w, h, netY } = COURT;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = '#0a1a0d';
+    ctx.fillRect(0, 0, W, H);
+
+    // Court surface — two halves (slightly different shade)
+    ctx.fillStyle = '#1a5c28';
+    ctx.fillRect(mx, my, w, h/2);
+    ctx.fillStyle = '#1d6a2e';
+    ctx.fillRect(mx, netY, w, h/2);
+
+    // Subtle grid texture
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= 16; i++) {
+      ctx.beginPath(); ctx.moveTo(mx+i*(w/16), my); ctx.lineTo(mx+i*(w/16), my+h); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mx, my+i*(h/16)); ctx.lineTo(mx+w, my+i*(h/16)); ctx.stroke();
+    }
+
+    // Court lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.88)';
+    ctx.lineWidth = 1.8;
+
+    // Outer boundary
+    ctx.strokeRect(mx, my, w, h);
+
+    // Singles sidelines (inset ~8% from each side)
+    const sl = mx + w*0.08;
+    const sr = mx + w*0.92;
+    ctx.beginPath(); ctx.moveTo(sl, my); ctx.lineTo(sl, my+h); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sr, my); ctx.lineTo(sr, my+h); ctx.stroke();
+
+    // Service boxes
+    const svcDepth = h * 0.265;
+    // Top service line
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(sl, netY-svcDepth); ctx.lineTo(sr, netY-svcDepth); ctx.stroke();
+    // Bottom service line
+    ctx.beginPath(); ctx.moveTo(sl, netY+svcDepth); ctx.lineTo(sr, netY+svcDepth); ctx.stroke();
+    // Centre service lines
+    ctx.beginPath(); ctx.moveTo((sl+sr)/2, netY-svcDepth); ctx.lineTo((sl+sr)/2, netY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo((sl+sr)/2, netY); ctx.lineTo((sl+sr)/2, netY+svcDepth); ctx.stroke();
+
+    // Baseline center marks
+    ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.moveTo(W/2-8, my); ctx.lineTo(W/2+8, my); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W/2-8, my+h); ctx.lineTo(W/2+8, my+h); ctx.stroke();
+
+    // Net
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(mx-4, netY); ctx.lineTo(mx+w+4, netY); ctx.stroke();
+
+    // Net posts
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillRect(mx-5, netY-8, 4, 16);
+    ctx.fillRect(mx+w+1, netY-8, 4, 16);
+
+    // Net shadow
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(mx-4, netY+2); ctx.lineTo(mx+w+4, netY+2); ctx.stroke();
+
+    // Player name labels
+    ctx.font = 'bold 9px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.textAlign = 'center';
+    ctx.fillText('MEDVEDEV', W/2, my+14);
+    ctx.fillText('NADAL', W/2, my+h-6);
+
+    // MatchPoint watermark
+    ctx.font = '7px monospace';
+    ctx.fillStyle = 'rgba(0,245,212,0.12)';
+    ctx.fillText('MatchPoint™ ELC', W/2, netY-4);
+
+    // ── Heatmap dots (old ones, faded) ──
+    heatDots.forEach(dot => {
+      dot.age = (dot.age || 0) + 1;
+      const alpha = Math.max(0, 0.65 - dot.age * 0.004);
+      if (alpha <= 0) return;
+      const { cx, cy } = dataToCanvas(dot.x, dot.y);
+      const color = dot.call === 'IN' ? `rgba(0,245,212,${alpha})` : `rgba(239,68,68,${alpha})`;
+      // Glow
+      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 8);
+      grd.addColorStop(0, color);
+      grd.addColorStop(1, 'transparent');
+      ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2);
+      ctx.fillStyle = grd; ctx.fill();
+      // Dot
+      ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2);
+      ctx.fillStyle = dot.call === 'IN' ? `rgba(0,245,212,${Math.min(1,alpha*2)})` : `rgba(239,68,68,${Math.min(1,alpha*2)})`;
+      ctx.fill();
+    });
+
+    // ── Shot arcs ──
+    shotArcs.forEach(arc => {
+      arc.age = (arc.age || 0) + 1;
+      const alpha = Math.max(0, 0.7 - arc.age * 0.012);
+      if (alpha <= 0) return;
+      const p1 = dataToCanvas(arc.x1, arc.y1);
+      const p2 = dataToCanvas(arc.x2, arc.y2);
+      // Control point curves toward net
+      const cpx = (p1.cx + p2.cx) / 2;
+      const cpy = Math.min(p1.cy, p2.cy) - 40 - Math.random()*20;
+      ctx.beginPath();
+      ctx.moveTo(p1.cx, p1.cy);
+      ctx.quadraticCurveTo(cpx, cpy, p2.cx, p2.cy);
+      ctx.strokeStyle = arc.call === 'IN'
+        ? `rgba(0,245,212,${alpha * 0.8})`
+        : `rgba(239,68,68,${alpha * 0.8})`;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    });
+
+    // Remove aged out items
+    heatDots.splice(0, heatDots.filter(d => (d.age||0) > 160).length);
+    shotArcs.splice(0, shotArcs.filter(a => (a.age||0) > 60).length);
+  }
+
+  // ── Composure Chart ───────────────────────────────────────
+  function initComposureChart() {
+    drawComposureChart([{ t:0, val:74 }]);
+  }
+
+  function drawComposureChart(points) {
+    const canvas = document.getElementById('ao22-composure-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const pad = { l:6, r:6, t:8, b:8 };
+    const gw = W-pad.l-pad.r, gh = H-pad.t-pad.b;
+
+    // Zone bands
+    const zones = [
+      { min:88, max:100, color:'rgba(234,179,8,0.14)',  label:'ELITE' },
+      { min:70, max:88,  color:'rgba(34,197,94,0.10)',  label:'STRONG' },
+      { min:55, max:70,  color:'rgba(14,165,233,0.09)', label:'STABLE' },
+      { min:0,  max:55,  color:'rgba(239,68,68,0.13)',  label:'CRITICAL' },
+    ];
+    zones.forEach(z => {
+      const y1 = pad.t + gh*(1-z.max/100);
+      const y2 = pad.t + gh*(1-z.min/100);
+      ctx.fillStyle = z.color;
+      ctx.fillRect(pad.l, y1, gw, y2-y1);
+    });
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 0.5;
+    [25,50,75].forEach(v => {
+      const gy = pad.t + gh*(1-v/100);
+      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(pad.l+gw, gy); ctx.stroke();
+    });
+
+    // Crisis shading
+    const crx1 = pad.l + (145/MAX_T)*gw;
+    const crx2 = pad.l + (185/MAX_T)*gw;
+    ctx.fillStyle = 'rgba(239,68,68,0.1)';
+    ctx.fillRect(crx1, pad.t, crx2-crx1, gh);
+
+    // Coach intervention line
+    const intX = pad.l + (168/MAX_T)*gw;
+    ctx.strokeStyle = 'rgba(167,139,250,0.5)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(intX, pad.t); ctx.lineTo(intX, pad.t+gh); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Zone labels (right side)
+    ctx.font = '5.5px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(234,179,8,0.75)'; ctx.fillText('ELITE', pad.l+gw-1, pad.t+gh*(1-90/100)+5);
+    ctx.fillStyle = 'rgba(239,68,68,0.75)'; ctx.fillText('CRIT', pad.l+gw-1, pad.t+gh*(1-45/100)+5);
+
+    if (points.length < 2) return;
+
+    // Line gradient
+    const grad = ctx.createLinearGradient(pad.l, 0, pad.l+gw, 0);
+    grad.addColorStop(0,    '#0ea5e9');
+    grad.addColorStop(0.33, '#f97316');
+    grad.addColorStop(0.40, '#ef4444');
+    grad.addColorStop(0.52, '#22c55e');
+    grad.addColorStop(0.72, '#eab308');
+    grad.addColorStop(1.0,  '#FFD700');
+
+    // Area fill
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      const px = pad.l + (p.t/MAX_T)*gw;
+      const py = pad.t + gh*(1-p.val/100);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    const last = points[points.length-1];
+    ctx.lineTo(pad.l + (last.t/MAX_T)*gw, pad.t+gh);
+    ctx.lineTo(pad.l + (points[0].t/MAX_T)*gw, pad.t+gh);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0,245,212,0.06)';
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      const px = pad.l + (p.t/MAX_T)*gw;
+      const py = pad.t + gh*(1-p.val/100);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Current dot
+    const cur = points[points.length-1];
+    const curX = pad.l + (cur.t/MAX_T)*gw;
+    const curY = pad.t + gh*(1-cur.val/100);
+    ctx.beginPath(); ctx.arc(curX, curY, 3.5, 0, Math.PI*2);
+    ctx.fillStyle = '#00f5d4'; ctx.fill();
+    // Pulse ring
+    ctx.beginPath(); ctx.arc(curX, curY, 6, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(0,245,212,0.3)'; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+
+  // ── Call logging ──────────────────────────────────────────
+  function logCall(callType, confidence, player) {
+    recentCalls.unshift({ call: callType, player: player || 'Auto', confidence: confidence || 99.0, t: Date.now() });
+    if (recentCalls.length > 5) recentCalls.pop();
+    renderRecentCalls();
+    flashCallBadge(callType);
+  }
+
+  function renderRecentCalls() {
+    const list = document.getElementById('ao22-recent-calls');
+    if (!list) return;
+    list.innerHTML = recentCalls.map(c => `
+      <div class="mp-recent-item">
+        <span class="mp-recent-call ${c.call}">${c.call}</span>
+        <span style="color:#64748b;font-size:0.52rem;">${c.player}</span>
+        <span style="color:#475569;font-size:0.52rem;">${c.confidence.toFixed(1)}%</span>
+      </div>
+    `).join('');
+  }
+
+  function flashCallBadge(callType) {
+    const flash = document.getElementById('ao22-call-flash');
+    if (!flash) return;
+    flash.textContent = callType;
+    flash.style.color = callType === 'IN' ? '#22c55e' : callType === 'OUT' ? '#ef4444' : '#eab308';
+    flash.style.opacity = '1';
+    setTimeout(() => { flash.style.opacity = '0'; }, 600);
+    // Fire the matching call button with pulse animation
+    fireCallButtonAnim(callType);
+  }
+
+  function fireCallButtonAnim(callType) {
+    // Map call type to button class selector
+    const map = { IN: '.mp-call-btn.in', OUT: '.mp-call-btn.out', LET: '.mp-call-btn.let', FAULT: '.mp-call-btn.fault' };
+    const sel = map[callType];
+    if (!sel) return;
+    const btn = document.querySelector(sel);
+    if (!btn) return;
+    btn.classList.remove('firing');
+    void btn.offsetWidth; // reflow to restart animation
+    btn.classList.add('firing');
+    btn.classList.add('active');
+    setTimeout(() => { btn.classList.remove('firing'); btn.classList.remove('active'); }, 380);
+  }
+
+  // ── Challenge Review ──────────────────────────────────────
+  function triggerChallenge() {
+    if (challengePending) return;
+    challengePending = true;
+    const overlay = document.getElementById('ao22-challenge-overlay');
+    const resultEl = document.getElementById('ao22-review-result');
+    if (!overlay || !resultEl) return;
+    overlay.classList.add('active');
+    resultEl.style.display = 'none';
+
+    // Get last call confidence from recent calls
+    const lastCall = recentCalls[0];
+    const confidence = lastCall ? lastCall.confidence : 97;
+    const overturned = confidence < 95; // low confidence = overturnable
+
+    setTimeout(() => {
+      resultEl.style.display = 'block';
+      if (overturned) {
+        resultEl.textContent = 'OVERTURNED';
+        resultEl.style.color = '#ef4444';
+        logCall('OVERTURNED', 100, 'Challenge');
+      } else {
+        resultEl.textContent = 'CONFIRMED';
+        resultEl.style.color = '#22c55e';
+        logCall('CONFIRMED', 100, 'Challenge');
+      }
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        resultEl.style.display = 'none';
+        challengePending = false;
+      }, 1800);
+    }, 2000);
+  }
+
+  // ── Video Sync State ─────────────────────────────────────
+  // When videoEl is set, frame selection is driven by video.currentTime
+  // instead of the internal 180ms clock. This is how GCP Video Intelligence
+  // data will plug in — frames have real timestamps matching the video.
+  let videoEl      = null;   // HTMLVideoElement to sync to (optional)
+  let videoOffset  = 0;      // demo_t = video.currentTime - videoOffset
+                             // Set this to the video timestamp where the demo data starts
+
+  function frameForTime(t) {
+    // Binary search for the frame closest to demo time t
+    const frames = window.AO2022_FRAMES;
+    if (!frames || !frames.length) return null;
+    let lo = 0, hi = frames.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (frames[mid].t < t) lo = mid + 1;
+      else hi = mid;
+    }
+    return frames[lo];
+  }
+
+  // ── Animation Loop ────────────────────────────────────────
+  function startAnimation(opts) {
+    if (isRunning) return;
+    const frames = window.AO2022_FRAMES;
+    if (!frames || !frames.length) { console.warn('[AO2022] No frame data'); return; }
+    isRunning = true;
+    frameIdx = 0;
+    shotArcs = []; heatDots = []; recentCalls = [];
+    lastActIdx = -1; lastCueIdx = -1; lastBounceFrame = -1;
+    _stopAllMatchAudio(); // reset audio state
+    _unlockAudio();       // pre-warm on first user gesture
+    // Accept optional video element for sync
+    if (opts && opts.video) {
+      videoEl     = opts.video;
+      videoOffset = opts.offset || 0;
+      console.log('[AO2022] Video sync mode: offset=' + videoOffset + 's');
+    } else {
+      videoEl = null;
+    }
+    // Reset EMA to first frame values so metrics start stable, not at defaults
+    const f0 = window.AO2022_FRAMES[0];
+    ema = { spd: f0.spd ?? 120, rpm: f0.rpm ?? 2500, conf: f0.conf ?? 76,
+            cov: f0.cov ?? 42, lat: 2.8, acc: 3.7 };
+    // Reset game stats session trackers
+    gs.maxServeMph  = Math.round((f0.spd ?? 120) * 0.621371);
+    gs.longestRally = 0; gs.rallySum = 0; gs.rallyCount = 0; gs.prevRc = 0;
+    gs.totalDistKm  = 0; gs.prevCovPct = f0.cov ?? 42;
+    gs.bestReaction = 0.45; gs.last10 = []; gs.shotCount = 0;
+    lastFrameTime = performance.now();
+    animFrame = requestAnimationFrame(tick);
+  }
+
+  function tick(now) {
+    if (!isRunning) return;
+
+    const frames = window.AO2022_FRAMES;
+
+    // ── Video-sync mode: find frame by video.currentTime ──
+    if (videoEl && !videoEl.paused && !videoEl.ended) {
+      const demoT = videoEl.currentTime - videoOffset;
+      if (demoT < 0) { animFrame = requestAnimationFrame(tick); return; }
+      const frame = frameForTime(demoT);
+      if (frame) updateFrame(frame);
+      animFrame = requestAnimationFrame(tick);
+      return;
+    }
+
+    // ── Internal clock mode (no video) ───────────────────
+    if (now - lastFrameTime < FRAME_MS) { animFrame = requestAnimationFrame(tick); return; }
+    lastFrameTime = now;
+
+    if (frameIdx >= frames.length) { showFinale(); return; }
+
+    const frame = frames[frameIdx++];
+    updateFrame(frame);
+    animFrame = requestAnimationFrame(tick);
+  }
+
+  function updateFrame(frame) {
+    const canvas = document.getElementById('ao22-court-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    // Detect bounce — z drops to near zero
+    const prevFrame = frameIdx > 1 ? window.AO2022_FRAMES[frameIdx-2] : null;
+    const isBounce = !!(prevFrame && prevFrame.z > 0.06 && frame.z < 0.04 && frameIdx - lastBounceFrame > 3);
+    if (isBounce) {
+      lastBounceFrame = frameIdx;
+      // Add heatmap dot
+      heatDots.push({ x: frame.x, y: frame.y, call: frame.call, age: 0 });
+      // Add arc from prev bounce
+      if (heatDots.length >= 2) {
+        const prev = heatDots[heatDots.length-2];
+        shotArcs.push({ x1: prev.x, y1: prev.y, x2: frame.x, y2: frame.y, call: frame.call, age: 0 });
+        if (shotArcs.length > MAX_ARCS) shotArcs.shift();
+      }
+      if (heatDots.length > MAX_DOTS) heatDots.shift();
+      // Log the call — use real confidence from frame data
+      const conf = frame.conf ?? (95 + (frame.z < 0.01 ? 2.5 : 0)); // higher conf on clean bounces
+      const player = frame.y > 0.84 ? 'Nadal' : 'Medvedev';
+      logCall(frame.call, conf, player);
+    }
+
+    // ── Match audio ──
+    _updateMatchAudio(frame, isBounce, prevFrame);
+
+    // Render court with all overlays
+    renderCourtFrame(ctx);
+
+    // Draw live ball
+    drawBall(ctx, frame);
+
+    // Update UI panels
+    updateScoreboard(frame.sets, frame.p1, frame.p2);
+    updateMomentum(frame.mom);
+    updateMetrics(frame);
+    updateActBanner(frame.t);
+    updateCoachCue(frame.t);
+    updateComposureArc(frame.t);
+    updateProgress(frame.t);
+
+    if (frame.log) {
+      const logEl = document.getElementById('ao22-log');
+      if (logEl && frame.log !== logEl.dataset.last) {
+        logEl.dataset.last = frame.log;
+        logEl.textContent = '▸ ' + frame.log;
+      }
+    }
+  }
+
+  function drawBall(ctx, frame) {
+    const { cx, cy } = dataToCanvas(frame.x, frame.y);
+    const ballR = 4.5 + frame.z * 9;
+
+    // Shadow
+    ctx.beginPath();
+    ctx.ellipse(cx, cy+4, ballR*1.3, ballR*0.45, 0, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fill();
+
+    // Glow
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, ballR*3);
+    glow.addColorStop(0, frame.call==='IN' ? 'rgba(232,255,0,0.55)' : 'rgba(239,68,68,0.55)');
+    glow.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(cx, cy, ballR*3, 0, Math.PI*2);
+    ctx.fillStyle = glow; ctx.fill();
+
+    // Ball body
+    const bg = ctx.createRadialGradient(cx-ballR*0.3, cy-ballR*0.3, 0, cx, cy, ballR);
+    bg.addColorStop(0, '#f5ff80');
+    bg.addColorStop(0.55, frame.call==='IN' ? '#ccff00' : '#ff5555');
+    bg.addColorStop(1, frame.call==='IN' ? '#7aaa00' : '#aa0000');
+    ctx.beginPath(); ctx.arc(cx, cy, ballR, 0, Math.PI*2);
+    ctx.fillStyle = bg; ctx.fill();
+
+    // Seams
+    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.arc(cx, cy, ballR*0.58, 0.4, Math.PI+0.4); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, ballR*0.58, Math.PI+0.4, 0.4); ctx.stroke();
+  }
+
+  // ── UI Updates ────────────────────────────────────────────
+  function updateScoreboard(sets, p1, p2) {
+    ['s1','s2','s3','s4','s5'].forEach((s, i) => {
+      const nEl = document.getElementById(`sb-n-${s}`);
+      const mEl = document.getElementById(`sb-m-${s}`);
+      if (!nEl || !mEl) return;
+      if (i < sets.length) {
+        const ns = sets[i][0], ms = sets[i][1];
+        nEl.textContent = ns; mEl.textContent = ms;
+        const nWon = ns > ms && (ns >= 6 || ns === 7);
+        const mWon = ms > ns && (ms >= 6 || ms === 7);
+        nEl.className = 'mp-sb-set' + (nWon ? ' won' : ns > ms ? '' : ' losing');
+        mEl.className = 'mp-sb-set' + (mWon ? ' won' : ms > ns ? '' : ' losing');
+      } else {
+        nEl.textContent = '—'; mEl.textContent = '—';
+        nEl.className = 'mp-sb-set'; mEl.className = 'mp-sb-set';
+      }
+    });
+    const nPts = document.getElementById('sb-n-pts');
+    const mPts = document.getElementById('sb-m-pts');
+    if (nPts) nPts.textContent = p1;
+    if (mPts) mPts.textContent = p2;
+  }
+
+  function updateMomentum(mom) {
+    const bar = document.getElementById('ao22-mom-bar');
+    const val = document.getElementById('ao22-mom-val');
+    if (bar) {
+      bar.style.width = mom + '%';
+      bar.style.background = mom > 80 ? 'linear-gradient(90deg,#eab308,#FFD700)'
+        : mom > 60 ? 'linear-gradient(90deg,#22c55e,#00f5d4)'
+        : mom > 35 ? 'linear-gradient(90deg,#0ea5e9,#00f5d4)'
+        : 'linear-gradient(90deg,#ef4444,#f97316)';
+    }
+    if (val) val.textContent = Math.round(mom);
+  }
+
+  function updateMetrics(frame) {
+    const spEl   = document.getElementById('ao22-speed');
+    const rpEl   = document.getElementById('ao22-rpm');
+    const confEl = document.getElementById('lcs-confidence');
+    const latEl  = document.getElementById('lcs-latency');
+    const accEl  = document.getElementById('lcs-accuracy');
+    const covEl  = document.getElementById('ao22-cov');
+    const rcEl   = document.getElementById('ao22-rally');
+
+    // Pull real frame values (fall back gracefully if frame data missing)
+    const rawSpd  = frame.spd  ?? 120;
+    const rawRpm  = frame.rpm  ?? (2400 + (rawSpd - 111) * 18);
+    const rawConf = frame.conf ?? 97;
+    const rawCov  = frame.cov  ?? 50;
+    const rawRc   = frame.rc   ?? 0;
+
+    // Latency: real hardware would be 2–5ms baseline, tiny thermal drift,
+    // occasional micro-spike on heavy-spin shots (rpm > 3200)
+    const spinLoad = Math.max(0, (rawRpm - 3000) / 800); // 0 at 3000, 1 at 3800
+    const targetLat = 2.2 + spinLoad * 2.1;
+    // Accuracy: tighter on clean bounces (z near 0), slightly wider mid-flight
+    const inFlight = (frame.z ?? 0) > 0.15;
+    const targetAcc = inFlight ? 4.2 + spinLoad * 1.4 : 3.2 + spinLoad * 0.8;
+
+    // EMA updates
+    ema.spd  = ema.spd  + EMA_SPD  * (rawSpd  - ema.spd);
+    ema.rpm  = ema.rpm  + EMA_RPM  * (rawRpm  - ema.rpm);
+    ema.conf = ema.conf + EMA_CONF * (rawConf  - ema.conf);
+    ema.cov  = ema.cov  + EMA_COV  * (rawCov   - ema.cov);
+    ema.lat  = ema.lat  + EMA_LAT  * (targetLat - ema.lat);
+    ema.acc  = ema.acc  + EMA_ACC  * (targetAcc - ema.acc);
+
+    // Update DOM — only write when element exists
+    if (spEl)   spEl.textContent   = Math.round(ema.spd);
+    if (rpEl)   rpEl.textContent   = Math.round(ema.rpm).toLocaleString();
+    if (confEl) confEl.textContent = ema.conf.toFixed(1) + '%';
+    if (latEl)  latEl.textContent  = ema.lat.toFixed(0) + 'ms';
+    if (accEl)  accEl.textContent  = ema.acc.toFixed(1) + 'mm';
+    if (covEl)  covEl.textContent  = ema.cov.toFixed(1) + '%';
+    if (rcEl)   rcEl.textContent   = rawRc;
+
+    // ── Bridge → Coach Control Dashboard ─────────────────────────────────
+    // Drive the LIVE tab metrics from real AO2022 frame data
+    // Physical  = speed index (how hard Nadal is hitting)
+    // Mental    = court coverage (spatial awareness / positioning)
+    // Emotional = confidence (system certainty — proxy for composure)
+    // Focus     = composite of coverage + momentum
+    const physPct  = Math.round(Math.min(99, Math.max(10, (ema.spd - 110) / (161 - 110) * 100)));
+    const mentalPct= Math.round(Math.min(99, Math.max(10, ema.cov)));
+    const emotPct  = Math.round(Math.min(99, Math.max(10, ema.conf)));
+    const focPct   = Math.round(Math.min(99, Math.max(10, (ema.cov * 0.6 + (rawRc / 40) * 40))));
+    const composure= Math.round(Math.min(99, Math.max(10, ema.conf - 5 + (frame.mom ?? 50) * 0.08)));
+
+    // Update Performance State bars (LIVE tab)
+    const setBar = (attr, pct) => {
+      const fill  = document.querySelector('#cc-tab-live .cc-bar-fill[data-bar="' + attr + '"]');
+      const label = document.querySelector('#cc-tab-live .cc-bar-label[data-bar="' + attr + '"]');
+      if (fill)  fill.style.width  = pct + '%';
+      if (label) label.textContent = pct + '%';
+    };
+    setBar('physical',  physPct);
+    setBar('mental',    mentalPct);
+    setBar('emotional', emotPct);
+    setBar('focus',     focPct);
+
+    // Update the 6 metric boxes
+    const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setTxt('physical-score',      physPct);
+    setTxt('mental-focus-display',mentalPct);
+    setTxt('heat-index',          Math.round(frame.mom ?? 50));
+    setTxt('composure-display',   composure);
+    setTxt('sync-latency-display', Math.round(ema.lat));
+    // UKF Fusion MPH — convert km/h to MPH
+    const ukfMph = Math.round(ema.spd * 0.621371);
+    setTxt('ukf-speed',           ukfMph);
+    const ukfEl = document.querySelector('#cc-tab-live [id*="ukf"], #cc-tab-live .cc-metric-val span:first-child');
+    // sync-latency already updated by ema.lat above via lcs-latency
+
+    // Update Neural Adapt, 1st Serve, Break Pt Conv, Net Points
+    const neuralAdapt  = Math.round(85 + (ema.conf - 76) * 0.6);
+    const firstServe   = Math.round(65 + physPct * 0.08);
+    const breakPtConv  = Math.round(60 + (frame.mom ?? 50) * 0.27);
+    const netPoints    = '+' + Math.round(10 + mentalPct * 0.05) + '%';
+    setTxt('neural-adapt-val',  neuralAdapt + '%');
+    setTxt('first-serve-val',   firstServe  + '%');
+    setTxt('break-pt-val',      breakPtConv + '%');
+    setTxt('net-points-val',    netPoints);
+
+    // Player names — drive from AO2022 match (Nadal vs Medvedev)
+    ['player1-name'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && (el.textContent.includes('Serena') || el.textContent.includes('Player A') || el.textContent === '')) {
+        el.textContent = '🇪🇸 Nadal';
+      }
+    });
+    ['player2-name'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && (el.textContent.includes('Venus') || el.textContent.includes('Player B') || el.textContent === '')) {
+        el.textContent = '🇷🇺 Medvedev';
+      }
+    });
+
+    // ── Update Game Metrics panel ──
+    updateGameStats(frame, ukfMph, rawRpm, rawCov, rawRc);
+
+    // Also update aegisDemo telemetry so data-telemetry bound elements stay in sync
+    if (window.MatchPointEventBus) {
+      window.MatchPointEventBus.emit('telemetry:updated', {
+        ballSpeed:          ukfMph,
+        emotionalComposure: emotPct,
+        physicalEnergy:     physPct,
+        mentalFocus:        mentalPct,
+        heatMapIntensity:   Math.round(frame.mom ?? 50),
+        latency:            Math.round(ema.lat),
+        accuracy:           ema.acc.toFixed(1)
+      });
+    }
+  }
+
+  function updateGameStats(frame, serveMph, rawRpm, rawCov, rawRc) {
+    const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+    // ─ Serve Speed + Max ─
+    if (serveMph > gs.maxServeMph) gs.maxServeMph = serveMph;
+    setTxt('gs-serve-speed', serveMph);
+    setTxt('gs-serve-max', 'Max: ' + gs.maxServeMph + ' mph');
+
+    // ─ Ball Spin + Type ─
+    const spinDisp = Math.round(ema.rpm).toLocaleString();
+    const spinType = ema.rpm > 3200 ? 'Topspin+' : ema.rpm > 2700 ? 'Topspin' : ema.rpm > 2200 ? 'Flat' : 'Slice';
+    setTxt('gs-spin', spinDisp);
+    setTxt('gs-spin-type', 'Type: ' + spinType);
+
+    // ─ Shot Accuracy (last 10) ─
+    // A "hit" = conf >= 85 (system confident the call was clean)
+    const isHit = ema.conf >= 85;
+    gs.last10.push(isHit ? 1 : 0);
+    if (gs.last10.length > 10) gs.last10.shift();
+    const hits = gs.last10.filter(v => v).length;
+    const accPct = Math.round((hits / gs.last10.length) * 100);
+    const last10Str = hits + '/' + gs.last10.length;
+    setTxt('gs-accuracy', accPct);
+    setTxt('gs-accuracy-sub', 'Last 10: ' + last10Str);
+
+    // ─ Court Coverage + Distance ─
+    const covPct = Math.round(ema.cov);
+    // Accumulate distance: each frame ~0.2s, coverage delta → rough km
+    const covDelta = Math.abs(ema.cov - gs.prevCovPct);
+    gs.totalDistKm += covDelta * 0.0003;  // tuned to give realistic ~1-2 km over demo
+    gs.prevCovPct = ema.cov;
+    setTxt('gs-coverage', covPct);
+    setTxt('gs-coverage-sub', 'Distance: ' + gs.totalDistKm.toFixed(1) + ' km');
+
+    // ─ Reaction Time ─
+    // Derived: faster ball = faster reaction required; oscillate around EMA latency
+    gs.shotCount++;
+    // Base: 0.55s at low speed (111 mph), 0.28s at high speed (161 mph)
+    const baseReact = 0.55 - ((serveMph - 111) / (161 - 111)) * 0.27;
+    // Add small per-frame noise via sin wave so it fluctuates naturally
+    const noise = Math.sin(gs.shotCount * 0.31) * 0.03;
+    const reactTime = Math.max(0.20, Math.min(0.75, baseReact + noise));
+    if (reactTime < gs.bestReaction) gs.bestReaction = reactTime;
+    setTxt('gs-reaction', reactTime.toFixed(2));
+    setTxt('gs-reaction-sub', 'Best: ' + gs.bestReaction.toFixed(2) + 's');
+
+    // ─ Rally Stats ─
+    // rawRc = running rally counter from frame data
+    // Detect rally end: rc resets to 0 or drops significantly
+    if (rawRc > 0 && rawRc < gs.prevRc) {
+      // Rally just ended (rc reset)
+      const finishedRally = gs.prevRc;
+      gs.rallySum += finishedRally;
+      gs.rallyCount++;
+      if (finishedRally > gs.longestRally) gs.longestRally = finishedRally;
+    }
+    gs.prevRc = rawRc;
+    const avgRally = gs.rallyCount > 0 ? (gs.rallySum / gs.rallyCount).toFixed(1) : rawRc > 0 ? rawRc : '0';
+    const longestDisp = Math.max(gs.longestRally, rawRc);
+    setTxt('gs-rally-avg', avgRally);
+    setTxt('gs-rally-longest', 'Longest: ' + longestDisp + ' shots');
+  }
+
+  function updateActBanner(t) {
+    let idx = 0;
+    for (let i = ACTS.length-1; i >= 0; i--) { if (t >= ACTS[i].t) { idx=i; break; } }
+    if (idx === lastActIdx) return;
+    lastActIdx = idx;
+    const act = ACTS[idx];
+    const banner = document.getElementById('ao22-act-banner');
+    const label = document.getElementById('ao22-act-label');
+    const title = document.getElementById('ao22-act-title');
+    if (label) { label.textContent = act.label; label.style.color = act.color; }
+    if (title) title.textContent = act.title;
+    if (banner) {
+      banner.style.background = hexAlpha(act.color, 0.1);
+      banner.style.borderColor = hexAlpha(act.color, 0.4);
+      banner.style.transform = 'scale(1.02)';
+      setTimeout(() => banner.style.transform = '', 350);
+    }
+  }
+
+  function updateCoachCue(t) {
+    let idx = 0;
+    for (let i = COACH_CUES.length-1; i >= 0; i--) { if (t >= COACH_CUES[i].t) { idx=i; break; } }
+    if (idx === lastCueIdx) return;
+    lastCueIdx = idx;
+    const el = document.getElementById('ao22-coach-cue');
+    if (!el) return;
+    el.style.opacity = '0';
+    setTimeout(() => { el.textContent = '"' + COACH_CUES[idx].cue + '"'; el.style.opacity = '1'; }, 260);
+  }
+
+  function updateComposureArc(t) {
+    const pts = COMPOSURE_ARC.filter(p => p.t <= t);
+    if (!pts.length) return;
+    drawComposureChart(pts);
+    const cur = pts[pts.length-1];
+    const tierEl = document.getElementById('ao22-tier-badge');
+    const valEl = document.getElementById('ao22-composure-val');
+    const flagEl = document.getElementById('ao22-intervene-flag');
+    if (tierEl) { tierEl.textContent = cur.tier; tierEl.style.color = cur.color; tierEl.style.background = hexAlpha(cur.color, 0.12); tierEl.style.borderColor = hexAlpha(cur.color, 0.3); }
+    if (valEl) { valEl.textContent = cur.val; valEl.style.color = cur.color; }
+    if (flagEl) flagEl.style.opacity = (t >= 145 && t <= 210) ? '1' : '0';
+  }
+
+  function updateProgress(t) {
+    const fill = document.getElementById('ao22-progress-fill');
+    const label = document.getElementById('ao22-time-label');
+    if (fill) fill.style.width = Math.min(100, (t/MAX_T)*100) + '%';
+    if (label) {
+      const m = Math.floor(t/60), s = Math.floor(t%60);
+      label.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    }
+  }
+
+  function showFinale() {
+    isRunning = false;
+    _stopAllMatchAudio();
+    const label = document.getElementById('ao22-act-label');
+    const title = document.getElementById('ao22-act-title');
+    const banner = document.getElementById('ao22-act-banner');
+    if (label) { label.textContent = '🏆'; label.style.color = '#FFD700'; }
+    if (title) title.textContent = 'Nadal — 21st Grand Slam · 2-6  6-7  6-4  7-5  6-4';
+    if (banner) { banner.style.background = hexAlpha('#FFD700',0.12); banner.style.borderColor = hexAlpha('#FFD700',0.4); }
+    const cue = document.getElementById('ao22-coach-cue');
+    if (cue) cue.textContent = '"Rafael Nadal. 21. The greatest. MatchPoint was there for every step."';
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
+  function hexAlpha(hex, a) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  // ── Public API ────────────────────────────────────────────
+  window.AO2022MatchPanel = {
+    build: buildPanel,
+    start: startAnimation,
+    stop: () => { isRunning = false; videoEl = null; if (animFrame) cancelAnimationFrame(animFrame); _stopAllMatchAudio(); },
+    manualCall: (type) => {
+      const confBase = ema.conf;
+      const conf = type === 'IN' ? Math.min(99.9, confBase + 1.2) : Math.max(80, confBase - 3.5);
+      logCall(type, conf, 'Manual');
+    },
+    triggerChallenge,
+    // Video Sync API ─────────────────────────────────────────────────────────
+    // Attach a <video> element so the panel tracks video.currentTime.
+    // offset = video timestamp (seconds) where demo_t=0 begins.
+    // Once GCP Video Intelligence data arrives, timestamps map 1:1.
+    // Example: AO2022MatchPanel.syncToVideo(document.getElementById('match-video'), 2000)
+    syncToVideo: (el, offset) => {
+      videoEl = el;
+      videoOffset = offset || 0;
+      if (!isRunning) startAnimation({ video: el, offset: videoOffset });
+      console.log('[AO2022] Video sync ON — offset=' + videoOffset + 's');
+    },
+    detachVideo: () => {
+      videoEl = null;
+      console.log('[AO2022] Video sync OFF — internal clock active');
+    },
+    // Seek panel to a specific demo timestamp (scrubbing / seek support)
+    seekTo: (t) => { const frame = frameForTime(t); if (frame) updateFrame(frame); },
+    frameForTime,
+    getVideoOffset: () => videoOffset
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', buildPanel);
+  } else {
+    buildPanel();
+  }
+
+})();
