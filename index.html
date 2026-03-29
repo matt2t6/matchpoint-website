@@ -4798,36 +4798,7 @@
     </style>
     <!-- === END: Cinematic Tour Assets === -->
 
-    <!-- ==========================================
-         SECURITY HARDENING - PHASE 1: HTTP HEADERS
-         ========================================== -->
 
-    <!-- Content Security Policy - Restrict resource loading -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.puter.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; connect-src 'self' https: wss: ws:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self';">
-
-    <!-- Prevent MIME type sniffing -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-
-    <!-- Prevent clickjacking attacks -->
-    <meta http-equiv="X-Frame-Options" content="DENY">
-
-    <!-- Enable XSS filtering -->
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-
-    <!-- Force HTTPS (when deployed) -->
-    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains; preload">
-
-    <!-- Referrer Policy -->
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-
-    <!-- Prevent caching of sensitive content -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-
-    <!-- ==========================================
-         END SECURITY HEADERS
-         ========================================== -->
 
     <script src="https://js.puter.com/v2/"></script>
 
