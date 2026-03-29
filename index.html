@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <script>
@@ -2393,10 +2393,10 @@
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MatchPoint Systems | AI Tennis Intelligence Platform</title>
+    <title>Phoenix Pro | Gold-Tier Electronic Line Calling</title>
     <meta
       name="description"
-      content="Millimeter-accurate line calls and personalized AI coaching for every tennis player. Elevate your game with MatchPoint Systems."
+      content="Millimeter-accurate line calls and personalized AI coaching for every tennis player. Elevate your game with Phoenix Pro."
     />
     <meta
       name="keywords"
@@ -2404,11 +2404,11 @@
     />
     <meta
       property="og:title"
-      content="MatchPoint Systems: Gold-Tier Electronic Line Calling"
+      content="Phoenix Pro: Gold-Tier Electronic Line Calling"
     />
     <meta
       property="og:description"
-      content="Millimeter-accurate line calls and personalized AI coaching for every tennis player. Elevate your game with MatchPoint Systems."
+      content="Millimeter-accurate line calls and personalized AI coaching for every tennis player. Elevate your game with Phoenix Pro."
     />
     <meta property="og:image" content="assets/matchpoint-logo-social.png" />
     <meta property="og:url" content="https://matchpointsystems.org" />
@@ -2416,11 +2416,11 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="MatchPoint Systems: Gold-Tier Electronic Line Calling"
+      content="Phoenix Pro: Gold-Tier Electronic Line Calling"
     />
     <meta
       name="twitter:description"
-      content="Millimeter-accurate line calls and personalized AI coaching for every tennis player. Elevate your game with MatchPoint Systems."
+      content="Millimeter-accurate line calls and personalized AI coaching for every tennis player. Elevate your game with Phoenix Pro."
     />
     <meta name="twitter:image" content="assets/matchpoint-logo-social.png" />
 
@@ -4798,21 +4798,50 @@
     </style>
     <!-- === END: Cinematic Tour Assets === -->
 
+    <!-- ==========================================
+         SECURITY HARDENING - PHASE 1: HTTP HEADERS
+         ========================================== -->
 
+    <!-- Content Security Policy - Restrict resource loading -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.puter.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; connect-src 'self' https: wss: ws:; font-src 'self' https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+
+    <!-- Prevent MIME type sniffing -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+    <!-- Prevent clickjacking attacks -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+
+    <!-- Enable XSS filtering -->
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+    <!-- Force HTTPS (when deployed) -->
+    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains; preload">
+
+    <!-- Referrer Policy -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- Prevent caching of sensitive content -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- ==========================================
+         END SECURITY HEADERS
+         ========================================== -->
 
     <script src="https://js.puter.com/v2/"></script>
 
     <!-- Tailwind CSS -->
     <!-- src/input.css removed: file does not exist -->
 
-    <!-- MatchPoint Systems Router -->
+    <!-- Phoenix Pro Router -->
     <script src="assets/js/router.js"></script>
   </head>
 
   <body>
     <div id="sse-badge" class="offline" style="display:none">SSE: OFFLINE</div>
 
-    <!-- MatchPoint Systems Global Navigation -->
+    <!-- Phoenix Pro Global Navigation -->
     <nav id="phoenix-nav" class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-cyan-500/20 backdrop-blur-md">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
@@ -4821,7 +4850,7 @@
             <img src="assets/matchpoint-logo.png" alt="MatchPoint" style="height:48px;width:48px;border-radius:8px;object-fit:cover;">
             <div style="display:flex;flex-direction:column;line-height:1.1;">
               <span class="font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent" style="font-size:1.05rem;letter-spacing:0.04em;">MatchPoint Systems</span>
-              <span style="font-size:0.62rem;font-weight:600;letter-spacing:0.04em;color:#64748b;text-transform:uppercase;margin-top:1px;">MatchPoint Systems</span>
+              <span style="font-size:0.62rem;font-weight:600;letter-spacing:0.04em;color:#64748b;text-transform:uppercase;margin-top:1px;">Phoenix Pro</span>
             </div>
           </div>
 
@@ -4853,7 +4882,7 @@
       </div>
     </nav>
 
-    <!-- Route 1: MatchPoint Systems Home/Hero -->
+    <!-- Route 1: Phoenix Pro Home/Hero -->
     <section id="home-legacy" class="route-section active pt-20" style="display:none!important;">
       <div id="broadcast-scoreboard" class="broadcast-scoreboard hidden"></div>
 
@@ -5004,7 +5033,7 @@
       <!-- Navigation Slide-Out Drawer (Right Side) -->
       <nav id="nav-drawer" class="nav-drawer">
       <div class="flex items-center gap-3">
-        <img src="assets/matchpoint-logo.png" alt="MatchPoint Systems" class="nav-logo" />
+        <img src="assets/matchpoint-logo.png" alt="Phoenix Pro" class="nav-logo" />
         <img src="assets/react logo sm.png" alt="React" class="h-6 w-auto opacity-70 hover:opacity-100 transition-opacity" title="React-Powered Dashboard" />
       </div>
       <ul class="nav-links">
@@ -5068,7 +5097,7 @@
     </nav>
     </section><!-- End Navigation Route -->
 
-    <!-- Route 4: MatchPoint Systems Live Dashboard -->
+    <!-- Route 4: Phoenix Pro Live Dashboard -->
     <section id="phoenix-route" class="route-section" style="display:none; height:calc(100vh - 64px); overflow:hidden;">
       <iframe
         id="phoenix-iframe"
@@ -5076,7 +5105,7 @@
         style="width:100%;height:100%;border:none;display:block;"
         allow="autoplay"
         loading="lazy"
-        title="MatchPoint MatchPoint Systems Dashboard"
+        title="MatchPoint Phoenix Pro Dashboard"
       ></iframe>
     </section><!-- End Phoenix Route -->
 
@@ -5090,16 +5119,16 @@
 
     <!-- Route 2: AEGIS Command Center -->
     <section id="aegis-dashboard" class="route-section" style="display: none;">
-      <!-- MatchPoint Systems Aegis Control Center - All Analytics Consolidated -->
+      <!-- Phoenix Pro Aegis Control Center - All Analytics Consolidated -->
       <div id="dashboard-slide-1" class="dashboard-drawer-container" style="width: 1400px !important; right: -200px;">
       <div class="aegis-container" id="aegis-core-drawer">
         <div class="aegis-grid" style="grid-template-columns: repeat(20, 1fr) !important; grid-template-rows: repeat(20, 1fr) !important; gap: 0.5rem !important; padding: 0.5rem;">
 
-          <!-- TOP: MatchPoint Systems ELC SCOREBOARD (Full Width) -->
+          <!-- TOP: PHOENIX PRO ELC SCOREBOARD (Full Width) -->
           <div class="aegis-cell" style="grid-column: span 20;">
             <div class="flex justify-between items-center mb-6">
               <div class="flex items-center gap-4">
-                <h3 class="text-3xl font-bold text-white">MatchPoint Systems ELC Scoreboard</h3>
+                <h3 class="text-3xl font-bold text-white">Phoenix Pro ELC Scoreboard</h3>
                 <div class="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
                   <span class="text-xs text-cyan-400">±3mm Gold-Tier Accuracy</span>
                 </div>
@@ -5678,7 +5707,7 @@
                 }, 1200);
               })(this)"
             >
-              See Live Demo (AEGIS Dashboard)
+              See the Working Demo
             </button>
             <button
               id="hero-watch-btn"
@@ -10067,7 +10096,7 @@ function initializeKalmanChart() {
         }
       }, 1000);
 
-      console.log("&#x1F3BE; MatchPoint Systems loaded successfully!");
+      console.log("&#x1F3BE; Phoenix Pro loaded successfully!");
       console.log("&#x1F916; AI Coach ready with local audio files!");
       console.log("&#x1F4CA; Analytics dashboard active!");
       console.log("&#x23F1; Performance monitoring active - Target: <200ms latency");
@@ -11900,7 +11929,7 @@ function initializeKalmanChart() {
         window.MatchPointEventBus.emit('harmonic:updated', d);
       });
     </script>
-    <footer class="mt-16 py-6 text-center text-sm text-slate-500">&copy; MatchPoint Systems&trade; 2025 &ndash; All Rights Reserved</footer>
+    <footer class="mt-16 py-6 text-center text-sm text-slate-500">&copy; Phoenix Pro&trade; 2025 &ndash; All Rights Reserved</footer>
     <script src="assets/js/sse-client.js" defer></script>
     <script src="assets/js/experiment.js" defer></script>
     <script src="assets/js/puter-auth-manager.js"></script>
