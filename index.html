@@ -4836,6 +4836,176 @@
 
     <!-- Phoenix Pro Router -->
     <script src="assets/js/router.js"></script>
+
+    <!-- ════════════════════════════════════════════════════════
+         AEGIS INTELLIGENCE OVERLAY SYSTEM
+         Co-created: Perplexity Computer × Matthew Egeto
+         ════════════════════════════════════════════════════════ -->
+    <style id="aegis-intel-styles">
+      /* ── Intel Card ─────────────────────────────────────── */
+      .aegis-intel-card {
+        position: fixed; right: -500px; top: 50%;
+        transform: translateY(-50%); width: 400px; max-height: 88vh;
+        overflow-y: auto; overflow-x: hidden;
+        background: linear-gradient(145deg,rgba(2,8,23,0.97) 0%,rgba(5,15,40,0.97) 100%);
+        border: 1px solid rgba(0,229,255,0.3); border-radius: 14px;
+        padding: 18px; z-index: 10000;
+        box-shadow: 0 0 80px rgba(0,229,255,0.12), 0 0 30px rgba(0,0,0,0.9),
+                    inset 0 0 60px rgba(0,229,255,0.03);
+        transition: right 0.75s cubic-bezier(0.16,1,0.3,1),
+                    opacity 0.4s ease; opacity:0; pointer-events:none;
+        font-family: 'Segoe UI', 'Calibri', sans-serif;
+      }
+      .aegis-intel-card.aic-visible {
+        right: 16px; opacity: 1; pointer-events: all;
+      }
+      .aegis-intel-card.confirmed-card {
+        border-color: rgba(34,197,94,0.4);
+        box-shadow: 0 0 80px rgba(34,197,94,0.12), 0 0 30px rgba(0,0,0,0.9);
+      }
+      .aic-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+      .aic-badge {
+        font-size:0.58rem; font-weight:800; letter-spacing:0.12em;
+        color:#0ea5e9; background:rgba(14,165,233,0.12);
+        border:1px solid rgba(14,165,233,0.3); border-radius:4px;
+        padding:2px 8px; text-transform:uppercase; white-space:nowrap;
+      }
+      .confirmed-badge { color:#22c55e; background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.3); }
+      .aic-timestamp { font-size:0.58rem; color:#475569; flex:1; text-align:right; }
+      .aic-close {
+        background:none; border:1px solid rgba(255,255,255,0.08); color:#475569;
+        cursor:pointer; font-size:0.75rem; padding:2px 7px; border-radius:4px;
+        transition:all 0.2s; line-height:1.4;
+      }
+      .aic-close:hover { color:#e2e8f0; border-color:rgba(255,255,255,0.2); }
+      .aic-headline {
+        font-size:1.15rem; font-weight:900; color:#f1f5f9;
+        letter-spacing:-0.02em; line-height:1.15; margin-bottom:5px;
+      }
+      .confirmed-headline { color:#22c55e; font-size:1.3rem; }
+      .aic-subline { font-size:0.69rem; color:#94a3b8; margin-bottom:12px; line-height:1.5; }
+      /* stat grid */
+      .aic-stat-grid {
+        display:grid; grid-template-columns:1fr 28px 1fr; gap:6px;
+        margin-bottom:8px; padding:10px;
+        background:rgba(255,255,255,0.025); border-radius:8px;
+        border:1px solid rgba(255,255,255,0.05);
+      }
+      .aic-player-label {
+        font-size:0.56rem; font-weight:800; letter-spacing:0.14em;
+        color:#334155; text-transform:uppercase; margin-bottom:6px;
+      }
+      .aic-stat-row { display:flex; align-items:baseline; gap:5px; margin-bottom:3px; }
+      .aic-stat-val { font-size:1.05rem; font-weight:800; color:#64748b; }
+      .aic-stat-val.dominant { color:#f97316; font-size:1.15rem; }
+      .nadal-col .aic-stat-val { color:#38bdf8; }
+      .aic-stat-key { font-size:0.6rem; color:#475569; }
+      .aic-vs {
+        font-size:0.62rem; font-weight:700; color:#1e293b;
+        display:flex; align-items:center; justify-content:center;
+      }
+      .aic-verdict { font-size:0.72rem; color:#94a3b8; text-align:center; margin:6px 0 10px; font-style:italic; }
+      .aic-divider { height:1px; background:linear-gradient(90deg,transparent,rgba(0,229,255,0.25),transparent); margin:8px 0; }
+      .aic-section-label {
+        font-size:0.58rem; font-weight:800; letter-spacing:0.14em;
+        color:#00e5ff; text-transform:uppercase; margin-bottom:8px;
+      }
+      /* composure bars */
+      .aic-comp-compare { display:flex; flex-direction:column; gap:7px; margin-bottom:12px; }
+      .aic-comp-row { display:flex; align-items:center; gap:8px; }
+      .aic-comp-name { font-size:0.6rem; color:#64748b; min-width:110px; }
+      .aic-comp-track {
+        flex:1; height:9px; background:rgba(255,255,255,0.05);
+        border-radius:5px; overflow:hidden; position:relative;
+      }
+      .aic-comp-fill {
+        height:100%; border-radius:5px; width:0%;
+        transition: width 1.8s cubic-bezier(0.16,1,0.3,1) 0.3s;
+        display:flex; align-items:center; padding-left:4px;
+        font-size:0.5rem; color:rgba(255,255,255,0.7); white-space:nowrap;
+      }
+      .aic-comp-fill.med-bar { background:linear-gradient(90deg,#f97316,#ef4444); }
+      .aic-comp-fill.nad-bar { background:linear-gradient(90deg,#0ea5e9,#22c55e); }
+      .aegis-intel-card.aic-visible .aic-comp-fill.med-bar { width:82%; }
+      .aegis-intel-card.aic-visible .aic-comp-fill.nad-bar { width:62%; }
+      .aic-comp-arrow { font-size:0.62rem; font-weight:700; margin-left:6px; }
+      .aic-comp-arrow.down { color:#ef4444; } .aic-comp-arrow.up { color:#22c55e; }
+      /* prediction box */
+      .aic-pred-box {
+        background:rgba(14,165,233,0.07); border:1px solid rgba(14,165,233,0.2);
+        border-radius:8px; padding:10px 12px; margin-bottom:4px;
+      }
+      .aic-pred-lbl { font-size:0.55rem; letter-spacing:0.12em; color:#0ea5e9; text-transform:uppercase; margin-bottom:3px; }
+      .aic-pred-val { font-size:0.88rem; font-weight:700; color:#e2e8f0; margin-bottom:3px; }
+      .aic-conf { color:#00e5ff; }
+      .aic-pred-sub { font-size:0.6rem; color:#475569; line-height:1.4; }
+      /* confirmed card */
+      .aic-final-row { display:flex; gap:10px; margin-bottom:12px; padding:10px; background:rgba(255,255,255,0.025); border-radius:8px; }
+      .aic-final-col { flex:1; text-align:center; }
+      .aic-final-player { font-size:0.58rem; color:#475569; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px; }
+      .aic-final-num { font-size:2.6rem; font-weight:900; line-height:1; margin-bottom:3px; }
+      .aic-final-num.collapse { color:#ef4444; }
+      .aic-final-num.ascend { color:#22c55e; }
+      .aic-final-lbl { font-size:0.58rem; color:#334155; }
+      .aic-signals { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
+      .aic-sig { font-size:0.68rem; color:#22c55e; display:flex; gap:8px; }
+      .aic-sig span { color:#64748b; }
+      .aic-closer { font-size:0.88rem; font-weight:700; color:#22c55e; text-align:center; line-height:1.5; padding-top:4px; }
+      .aic-closer em { font-size:0.62rem; font-weight:400; font-style:italic; color:#475569; display:block; }
+
+      /* ── Agent Activity Ring ─────────────────────────────── */
+      #aegis-agent-ring {
+        display:flex; align-items:center; justify-content:center;
+        gap:8px; padding:8px 12px 6px;
+        border-top:1px solid rgba(0,229,255,0.08);
+        margin-top:4px;
+      }
+      .aag-node {
+        display:flex; flex-direction:column; align-items:center; gap:3px;
+        cursor:default;
+      }
+      .aag-dot {
+        width:10px; height:10px; border-radius:50%;
+        background: var(--aag-color, #00e5ff);
+        box-shadow: 0 0 6px var(--aag-color, #00e5ff);
+        animation: aag-pulse var(--aag-speed, 2s) ease-in-out infinite;
+        position:relative;
+      }
+      .aag-dot::after {
+        content:''; position:absolute; inset:-3px; border-radius:50%;
+        border:1px solid var(--aag-color, #00e5ff);
+        opacity:0.3; animation: aag-ring var(--aag-speed, 2s) ease-out infinite;
+      }
+      @keyframes aag-pulse {
+        0%,100% { transform:scale(1); opacity:0.7; }
+        50%      { transform:scale(1.3); opacity:1; }
+      }
+      @keyframes aag-ring {
+        0%   { transform:scale(1); opacity:0.4; }
+        100% { transform:scale(2.2); opacity:0; }
+      }
+      #aegis-agent-ring[data-intensity="high"] .aag-dot { animation-duration:0.9s !important; }
+      #aegis-agent-ring[data-intensity="critical"] .aag-dot {
+        animation-duration:0.5s !important;
+        box-shadow: 0 0 14px var(--aag-color), 0 0 28px var(--aag-color) !important;
+      }
+      .aag-label { font-size:0.45rem; color:#334155; letter-spacing:0.04em; text-align:center; }
+      #aegis-agent-ring[data-intensity="critical"] .aag-label { color:#64748b; }
+
+      /* ── Serve Signature Flash ───────────────────────────── */
+      #aegis-serve-flash {
+        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+        background:rgba(0,8,24,0.92); border:1px solid rgba(0,229,255,0.5);
+        border-radius:8px; padding:8px 14px; z-index:500;
+        text-align:center; pointer-events:none;
+        opacity:0; transition:opacity 0.15s;
+        white-space:nowrap;
+      }
+      #aegis-serve-flash.flash-show { opacity:1; }
+      .asf-speed { font-size:1.4rem; font-weight:900; color:#00e5ff; line-height:1; }
+      .asf-label { font-size:0.55rem; letter-spacing:0.1em; color:#38bdf8; }
+      .asf-conf  { font-size:0.58rem; color:#22c55e; margin-top:2px; }
+    </style>
   </head>
 
   <body>
@@ -12555,6 +12725,166 @@ function initializeKalmanChart() {
           }
         });
       })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════
+         AEGIS INTELLIGENCE OVERLAY CARDS + AGENT RING
+         Co-created: Perplexity Computer × Matthew Egeto
+         ════════════════════════════════════════════════════════ -->
+
+    <!-- Card 1: THE SCOREBOARD PARADOX — fires at CRISIS act -->
+    <div id="aegis-intel-paradox" class="aegis-intel-card" role="dialog" aria-label="AEGIS Intelligence Report">
+      <div class="aic-header">
+        <span class="aic-badge">⚡ AEGIS INTELLIGENCE</span>
+        <span class="aic-timestamp">Filed · Set 2, Game 7 · 47 min ago</span>
+        <button class="aic-close" onclick="window.aegisDismissCard('aegis-intel-paradox')" title="Dismiss">✕</button>
+      </div>
+      <div class="aic-headline">WHAT THE SCOREBOARD<br>DOESN'T SHOW</div>
+      <div class="aic-subline">Medvedev led every conventional metric. AEGIS detected what no scoreboard can measure — 47 minutes before the collapse.</div>
+
+      <div class="aic-stat-grid">
+        <div class="medvedev-col">
+          <div class="aic-player-label">MEDVEDEV</div>
+          <div class="aic-stat-row"><span class="aic-stat-val dominant">23</span><span class="aic-stat-key">Aces</span></div>
+          <div class="aic-stat-row"><span class="aic-stat-val dominant">76</span><span class="aic-stat-key">Winners</span></div>
+          <div class="aic-stat-row"><span class="aic-stat-val dominant">189</span><span class="aic-stat-key">Points Won</span></div>
+          <div class="aic-stat-row"><span class="aic-stat-val dominant">2–0</span><span class="aic-stat-key">Sets</span></div>
+        </div>
+        <div class="aic-vs">VS</div>
+        <div class="nadal-col">
+          <div class="aic-player-label">NADAL</div>
+          <div class="aic-stat-row"><span class="aic-stat-val">3</span><span class="aic-stat-key">Aces</span></div>
+          <div class="aic-stat-row"><span class="aic-stat-val">69</span><span class="aic-stat-key">Winners</span></div>
+          <div class="aic-stat-row"><span class="aic-stat-val">182</span><span class="aic-stat-key">Points Won</span></div>
+          <div class="aic-stat-row"><span class="aic-stat-val">0–2</span><span class="aic-stat-key">Sets</span></div>
+        </div>
+      </div>
+      <div class="aic-verdict">By every scoreboard metric — <strong>Medvedev should win.</strong></div>
+
+      <div class="aic-divider"></div>
+      <div class="aic-section-label">▼ WHAT AEGIS SEES</div>
+
+      <div class="aic-comp-compare">
+        <div class="aic-comp-row">
+          <span class="aic-comp-name">Medvedev Composure</span>
+          <div class="aic-comp-track">
+            <div class="aic-comp-fill med-bar">82<span class="aic-comp-arrow down">&nbsp;→ 34 ↓</span></div>
+          </div>
+        </div>
+        <div class="aic-comp-row">
+          <span class="aic-comp-name">Nadal Composure</span>
+          <div class="aic-comp-track">
+            <div class="aic-comp-fill nad-bar">62<span class="aic-comp-arrow up">&nbsp;→ 89 ↑</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="aic-pred-box">
+        <div class="aic-pred-lbl">🔮 AEGIS PREDICTION — ACTIVE</div>
+        <div class="aic-pred-val">Nadal comeback — <span class="aic-conf">91% confidence</span></div>
+        <div class="aic-pred-sub">Serve speed decay · Break-point hesitation +0.34s · Composure divergence detected</div>
+      </div>
+    </div>
+
+    <!-- Card 2: PREDICTION CONFIRMED — fires at ACT IV (Champion State) -->
+    <div id="aegis-intel-confirmed" class="aegis-intel-card confirmed-card" role="dialog" aria-label="AEGIS Prediction Confirmed">
+      <div class="aic-header">
+        <span class="aic-badge confirmed-badge">✓ PREDICTION CONFIRMED</span>
+        <span class="aic-timestamp">AO 2022 Final · Set 5, Game 12</span>
+        <button class="aic-close" onclick="window.aegisDismissCard('aegis-intel-confirmed')" title="Dismiss">✕</button>
+      </div>
+      <div class="aic-headline confirmed-headline">AEGIS WAS RIGHT.<br>47 MINUTES EARLY.</div>
+      <div class="aic-subline">Every signal AEGIS detected in Set 2 materialized exactly as predicted. Medvedev collapsed. Nadal ascended.</div>
+
+      <div class="aic-final-row">
+        <div class="aic-final-col">
+          <div class="aic-final-player">Medvedev</div>
+          <div class="aic-final-num collapse" id="aic-med-comp">—</div>
+          <div class="aic-final-lbl">Composure at collapse</div>
+        </div>
+        <div style="width:1px;background:rgba(255,255,255,0.06);"></div>
+        <div class="aic-final-col">
+          <div class="aic-final-player">Nadal</div>
+          <div class="aic-final-num ascend" id="aic-nad-comp">—</div>
+          <div class="aic-final-lbl">Composure at victory</div>
+        </div>
+      </div>
+
+      <div class="aic-signals">
+        <div class="aic-sig">✓ <span>Serve speed: −8 mph by Set 5</span></div>
+        <div class="aic-sig">✓ <span>Break-point hesitation: +0.34s above baseline</span></div>
+        <div class="aic-sig">✓ <span>Composure divergence: Δ58 points</span></div>
+        <div class="aic-sig">✓ <span>Double-fault cadence: 3× baseline rate in Set 5</span></div>
+      </div>
+
+      <div class="aic-closer">
+        Champions win on composure. AEGIS protects it.
+        <em>Not just line calling. Predictive competitive intelligence.</em>
+      </div>
+    </div>
+
+    <script>
+    // ─── AEGIS Intel Card System ───────────────────────────────
+    (function() {
+      var _timers = {};
+
+      window.aegisShowIntelCard = function(id, autoDismissMs) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        // Animate composure numbers on confirmed card
+        if (id === 'aegis-intel-confirmed') {
+          var medEl = document.getElementById('aic-med-comp');
+          var nadEl = document.getElementById('aic-nad-comp');
+          if (medEl) animateNumber(medEl, 0, 31, 1200);
+          if (nadEl) animateNumber(nadEl, 0, 89, 1400);
+        }
+        el.classList.add('aic-visible');
+        if (autoDismissMs) {
+          _timers[id] = setTimeout(function() {
+            window.aegisDismissCard(id);
+          }, autoDismissMs);
+        }
+      };
+
+      window.aegisDismissCard = function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.style.opacity = '0';
+        el.style.right = '-500px';
+        setTimeout(function() {
+          el.classList.remove('aic-visible');
+          el.style.opacity = '';
+          el.style.right = '';
+        }, 750);
+        clearTimeout(_timers[id]);
+      };
+
+      function animateNumber(el, from, to, duration) {
+        var start = performance.now();
+        function step(now) {
+          var p = Math.min((now - start) / duration, 1);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(from + (to - from) * eased);
+          if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      // ─── Serve Signature Flash ──────────────────────────────
+      var _flashTimer = null;
+      window.aegisServeFlash = function(mph, conf) {
+        var el = document.getElementById('aegis-serve-flash');
+        if (!el) return;
+        var confDisp = conf ? conf.toFixed(1) : '97.0';
+        el.querySelector('.asf-speed').textContent = mph + ' mph';
+        el.querySelector('.asf-conf').textContent = 'ELC CALL · ' + confDisp + '% · 3ms';
+        el.classList.add('flash-show');
+        clearTimeout(_flashTimer);
+        _flashTimer = setTimeout(function() {
+          el.classList.remove('flash-show');
+        }, 1800);
+      };
+    })();
     </script>
   </body>
  </html>

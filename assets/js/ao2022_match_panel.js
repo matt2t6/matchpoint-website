@@ -1917,6 +1917,8 @@
         isServeFlight = true;
         var _sMph = Math.round(frame.spd || 160); // spd already in mph
         serveLabel = { text: _sMph + ' mph SERVE', born: performance.now(), cx: _bp.cx, cy: _bp.cy };
+        // ── AEGIS Serve Signature Flash ──
+        window.aegisServeFlash && window.aegisServeFlash(_sMph, ema.conf);
       } else {
         isServeFlight = false;
       }
@@ -2982,6 +2984,20 @@
       banner.style.transform = 'scale(1.02)';
       setTimeout(() => banner.style.transform = '', 350);
     }
+    // ── AEGIS Intelligence Event Triggers ──────────────────────
+    // idx 2 = CRISIS (t=160) · idx 4 = ACT IV Champion State (t=300) · idx 5 = 🏆
+    if (idx === 2 && !window._aegisParadoxFired) {
+      window._aegisParadoxFired = true;
+      setTimeout(() => window.aegisShowIntelCard('aegis-intel-paradox', 16000), 600);
+    }
+    if (idx >= 4 && !window._aegisConfirmedFired) {
+      window._aegisConfirmedFired = true;
+      setTimeout(() => window.aegisShowIntelCard('aegis-intel-confirmed', 20000), 800);
+    }
+    // ── Agent ring intensity ────────────────────────────────────
+    const intensity = ['low','low','high','medium','critical','critical'][idx] || 'medium';
+    const ring = document.getElementById('aegis-agent-ring');
+    if (ring) { ring.dataset.intensity = intensity; }
   }
 
   let cueHistory = [];  // rolling list of last 3 coach cues
