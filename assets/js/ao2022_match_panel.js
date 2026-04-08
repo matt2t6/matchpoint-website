@@ -250,10 +250,10 @@
 
   // ── EMA smoothing state for metrics (prevents squirrelly jumps) ──
   // α = smoothing factor: lower = smoother, higher = more responsive
-  const EMA_SPD  = 0.12;  // speed — smoother at slower frame rate
-  const EMA_RPM  = 0.09;  // spin — gentle drift
-  const EMA_CONF = 0.06;  // confidence — very stable
-  const EMA_COV  = 0.05;  // court coverage — slow drift metric
+  const EMA_SPD  = 0.20;  // speed — faster response gives visible serve-to-serve variation
+  const EMA_RPM  = 0.12;  // spin — slightly faster for visible type transitions
+  const EMA_CONF = 0.10;  // confidence — faster so pressure phases visibly affect metrics
+  const EMA_COV  = 0.08;  // court coverage — more responsive to player movement
   const EMA_LAT  = 0.03;  // latency — near-static
   const EMA_ACC  = 0.04;  // accuracy — near-static
   let ema = { spd: 120, rpm: 2600, conf: 97, cov: 42, lat: 2.8, acc: 3.7 };
@@ -2881,8 +2881,10 @@
     setTxt('gs-spin-type', 'Type: ' + spinType);
 
     // ─ Shot Accuracy (last 10) ─
-    // A "hit" = conf >= 70 (calibrated to AO2022 frame data avg conf of 77.5)
-    const isHit = ema.conf >= 70;
+    // Probabilistic hit: ema.conf (avg 77.5) drives hit rate naturally.
+    // At conf 77 → 77% hit rate → last-10 fluctuates ~7-8/10.
+    // Drops during pressure (low conf), rises during good phases.
+    const isHit = Math.random() < (ema.conf / 100);
     gs.last10.push(isHit ? 1 : 0);
     if (gs.last10.length > 10) gs.last10.shift();
     const hits = gs.last10.filter(v => v).length;
