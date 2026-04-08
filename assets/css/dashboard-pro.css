@@ -1,0 +1,288 @@
+/* ══════════════════════════════════════════════════════════════════
+   MATCHPOINT SYSTEMS — DASHBOARD PRO VISUAL SYSTEM v2
+   Co-created: Perplexity Computer × Matthew Egeto
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. TYPOGRAPHY IMPORT ──────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ── 2. PANEL BASE FONT ────────────────────────────────────────── */
+#ao2022-match-panel,
+#ao2022-match-panel * {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── 3. ALL LIVE NUMBERS → JetBrains Mono ──────────────────────── */
+/* Monospaced tabular digits prevent layout shift as values update */
+.mp-stat-val,
+.mp-metric-val,
+.mp-sb-set,
+.mp-sb-pts,
+#ao22-composure-val,
+#ao22-nadal-pct,
+#ao22-medv-pct,
+#ao22-mom-delta,
+#ao22-depth {
+  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* ── 4. STAT CARD VALUES — 0.72rem → 1.45rem ───────────────────── */
+/* This is the single highest-impact change on the dashboard       */
+.mp-stat-val {
+  font-size: 1.45rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1 !important;
+  color: var(--sc-text, #00f5d4) !important;
+  text-shadow: 0 0 16px var(--sc-glow, rgba(0,245,212,0.2)) !important;
+}
+
+/* Unit label (mph / rpm / % / s) — superscript style */
+.mp-stat-unit {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.6rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.07em !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+  margin-left: 3px !important;
+  vertical-align: 0.2em !important;
+  text-shadow: none !important;
+}
+
+/* Card label (SERVE SPEED, BALL SPIN…) */
+.mp-stat-label {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.56rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.13em !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.28) !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* Secondary stat line (Last 10: 4/5, Max: 116 mph…) */
+.mp-stat-sub {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.57rem !important;
+  color: rgba(255, 255, 255, 0.22) !important;
+  margin-top: 0.2rem !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+
+/* Stat card — more breathing room */
+.mp-stat-card {
+  padding: 0.55rem 0.6rem !important;
+  transition: box-shadow 0.25s ease, transform 0.2s ease !important;
+}
+.mp-stat-card:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* ── 5. LCS METRICS (Accuracy / Latency / AI Confidence) ───────── */
+.mp-metric-val {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.1 !important;
+}
+
+.mp-metric-label {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.54rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.28) !important;
+  margin-top: 0.15rem !important;
+}
+
+.mp-lcs-title {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.6rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+/* ── 6. WIN PROBABILITY PERCENTAGES ────────────────────────────── */
+#ao22-nadal-pct,
+#ao22-medv-pct {
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* ── 7. COMPOSURE PANEL ─────────────────────────────────────────── */
+#ao22-composure-val {
+  font-size: 2.5rem !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.05em !important;
+  line-height: 1 !important;
+}
+
+#ao22-composure-canvas {
+  height: 108px !important;
+  border-radius: 5px !important;
+}
+
+.mp-tier-badge {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.58rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.14em !important;
+}
+
+/* ── 8. MOMENTUM + DEPTH CHIPS ──────────────────────────────────── */
+#ao22-mom-delta,
+#ao22-depth {
+  font-size: 1.3rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+}
+#ao22-mom-trend,
+#ao22-depth-sub {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.58rem !important;
+}
+
+/* ── 9. COACH CUE QUOTES ────────────────────────────────────────── */
+.mp-cue-item {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.76rem !important;
+  line-height: 1.62 !important;
+  padding: 0.44rem 0.65rem !important;
+  border-left-width: 3px !important;
+  border-radius: 5px !important;
+}
+
+/* Primary (most recent) cue */
+.mp-cue-item:not(.mp-cue-stale) {
+  font-size: 0.8rem !important;
+  color: #cbd5e1 !important;
+  background: rgba(0, 245, 212, 0.05) !important;
+  border-left-color: rgba(0, 245, 212, 0.6) !important;
+  font-style: italic !important;
+}
+
+.mp-cue-stale {
+  font-size: 0.65rem !important;
+  color: #2d3f52 !important;
+  background: transparent !important;
+}
+
+/* ── 10. ACT BANNER ─────────────────────────────────────────────── */
+.mp-act-banner {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+}
+#ao22-act-label {
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  font-size: 0.58rem !important;
+}
+
+/* ── 11. MATCH SCORE DISPLAY ────────────────────────────────────── */
+.mp-sb-set {
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  min-width: 1.4rem !important;
+  text-align: center !important;
+}
+.mp-sb-pts {
+  font-size: 1.2rem !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 12px rgba(0, 245, 212, 0.35) !important;
+}
+
+/* ── 12. RECENT CALLS ───────────────────────────────────────────── */
+.mp-recent-list {
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* ── 13. PROGRESS STRIP / TIMELINE ─────────────────────────────── */
+.mp-act-markers span {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.58rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* ── 14. AGENT ACTIVITY RING ────────────────────────────────────── */
+.aag-label {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.44rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* ── 15. INTEL OVERLAY CARDS ────────────────────────────────────── */
+.aegis-intel-card,
+.aegis-intel-card * {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif !important;
+}
+.aic-stat-val,
+.aic-final-num,
+#aic-med-comp,
+#aic-nad-comp {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* ── 16. COACH CONTROL PANEL (index.html sections) ──────────────── */
+/* Emotional intelligence metric values */
+#confidence-value,
+#focus-value,
+#resilience-value,
+#aggression-value,
+#stability-value,
+#recovery-potential {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-variant-numeric: tabular-nums !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Inline stats (1st Srv, Brk Conv, Net Pts) */
+#break-pt-val,
+#first-serve-val,
+#net-points-val,
+#neural-adapt-val {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* PERF STATE bar percentage labels */
+.cc-bar-label {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* ── 17. SERVE SIGNATURE FLASH ──────────────────────────────────── */
+.asf-speed {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: -0.03em !important;
+}
+.asf-label,
+.asf-conf {
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* ── 18. REFINED VALUE FLASH ANIMATION ──────────────────────────── */
+@keyframes mp-val-pulse {
+  0%   { opacity: 1; transform: scale(1); }
+  20%  { opacity: 0.55; transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.mp-live-flash {
+  animation: mp-val-pulse 0.42s ease-out !important;
+}

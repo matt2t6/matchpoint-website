@@ -959,7 +959,7 @@
       <!-- RIGHT: Composure Arc -->
       <div class="mp-composure-panel">
         <div class="mp-composure-title">Composure Arc</div>
-        <canvas id="ao22-composure-canvas" width="140" height="90"></canvas>
+        <canvas id="ao22-composure-canvas" width="200" height="120"></canvas>
         <div style="text-align:center;margin-top:0.25rem;">
           <div id="ao22-tier-badge" class="mp-tier-badge" style="color:#0ea5e9;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.3);">STABLE</div>
           <div id="ao22-composure-val" style="font-size:1.5rem;font-weight:800;color:#e2e8f0;margin:0.2rem 0 0;line-height:1;">74</div>
