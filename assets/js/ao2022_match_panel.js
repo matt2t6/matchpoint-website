@@ -1757,7 +1757,7 @@
     ema = { spd: f0.spd || 120, rpm: f0.rpm || 2500, conf: f0.conf || 76,
             cov: f0.cov || 42, lat: 2.8, acc: 3.7 };
     // Reset game stats session trackers
-    gs.maxServeMph  = Math.round((f0.spd || 120) * 0.621371);
+    gs.maxServeMph  = Math.round(f0.spd || 120); // spd is already in mph
     gs.longestRally = 0; gs.rallySum = 0; gs.rallyCount = 0; gs.prevRc = 0;
     gs.totalDistKm  = 0; gs.prevCovPct = f0.cov || 42;
     gs.bestReaction = 0.45; gs.last10 = []; gs.shotCount = 0;
@@ -1915,7 +1915,7 @@
       var _nearBase = (frame.y < 0.74 || frame.y > 0.945);
       if (_nearBase && (frame.spd || 0) > 140) {
         isServeFlight = true;
-        var _sMph = Math.round((frame.spd || 160) * 0.621);
+        var _sMph = Math.round(frame.spd || 160); // spd already in mph
         serveLabel = { text: _sMph + ' mph SERVE', born: performance.now(), cx: _bp.cx, cy: _bp.cy };
       } else {
         isServeFlight = false;
@@ -2685,16 +2685,17 @@
     setTxt('heat-index',          Math.round(frame.mom || 50));
     setTxt('composure-display',   composure);
     setTxt('sync-latency-display', Math.round(ema.lat));
-    // UKF Fusion MPH — convert km/h to MPH
-    const ukfMph = Math.round(ema.spd * 0.621371);
+    // UKF Fusion MPH — spd values are already in mph (no conversion needed)
+    const ukfMph = Math.round(ema.spd);
     setTxt('ukf-speed',           ukfMph);
     const ukfEl = document.querySelector('#cc-tab-live [id*="ukf"], #cc-tab-live .cc-metric-val span:first-child');
     // sync-latency already updated by ema.lat above via lcs-latency
 
     // Update Neural Adapt, 1st Serve, Break Pt Conv, Net Points
+    // AO 2022 Final real values: Nadal 1st serve 62%, break pt conv 32% (7/22)
     const neuralAdapt  = Math.round(85 + (ema.conf - 76) * 0.6);
-    const firstServe   = Math.round(65 + physPct * 0.08);
-    const breakPtConv  = Math.round(60 + (frame.mom || 50) * 0.27);
+    const firstServe   = Math.round(58 + physPct * 0.05);   // ~58-63%, centred on 62%
+    const breakPtConv  = Math.round(22 + Math.min(50, frame.mom || 50) * 0.20); // ~22-32%
     const netPoints    = '+' + Math.round(10 + mentalPct * 0.05) + '%';
     setTxt('neural-adapt-val',  neuralAdapt + '%');
     setTxt('first-serve-val',   firstServe  + '%');
@@ -2880,8 +2881,8 @@
     setTxt('gs-spin-type', 'Type: ' + spinType);
 
     // ─ Shot Accuracy (last 10) ─
-    // A "hit" = conf >= 85 (system confident the call was clean)
-    const isHit = ema.conf >= 85;
+    // A "hit" = conf >= 70 (calibrated to AO2022 frame data avg conf of 77.5)
+    const isHit = ema.conf >= 70;
     gs.last10.push(isHit ? 1 : 0);
     if (gs.last10.length > 10) gs.last10.shift();
     const hits = gs.last10.filter(v => v).length;
@@ -2894,7 +2895,7 @@
     const covPct = Math.round(ema.cov);
     // Accumulate distance: each frame ~0.2s, coverage delta → rough km
     const covDelta = Math.abs(ema.cov - gs.prevCovPct);
-    gs.totalDistKm += covDelta * 0.0003;  // tuned to give realistic ~1-2 km over demo
+    gs.totalDistKm += covDelta * 0.0025;  // tuned to give realistic ~1-2 km over demo
     gs.prevCovPct = ema.cov;
     setTxt('gs-coverage', covPct);
     setTxt('gs-coverage-sub', 'Distance: ' + gs.totalDistKm.toFixed(1) + ' km');
