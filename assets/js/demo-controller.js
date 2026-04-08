@@ -25,14 +25,16 @@ const METRIC_CONFIG = Object.freeze({
   court_coverage: { id: "court-coverage", decimals: 0, className: "metric-coverage" }
 });
 
+// serve_speed values are in mph, matching AO 2022 Final data
+// Nadal: avg 1st serve 116 mph, max 124 mph, avg 2nd serve 99 mph
 const PHASE_PROFILES = Object.freeze({
-  warmup:   { color: "#00f6ff", serve_speed: 95,  spin_rate: 2550, rally_length: 3, shot_accuracy: 76, reaction_time: 0.34, court_coverage: 68 },
-  rally:    { color: "#00e0ff", serve_speed: 112, spin_rate: 3100, rally_length: 6, shot_accuracy: 82, reaction_time: 0.28, court_coverage: 74 },
-  pressure: { color: "#ff8800", serve_speed: 130, spin_rate: 2950, rally_length: 4, shot_accuracy: 68, reaction_time: 0.24, court_coverage: 70 },
-  reset:    { color: "#38bdf8", serve_speed: 118, spin_rate: 3000, rally_length: 5, shot_accuracy: 81, reaction_time: 0.27, court_coverage: 72 },
-  extended: { color: "#ff0055", serve_speed: 125, spin_rate: 3350, rally_length: 9, shot_accuracy: 88, reaction_time: 0.26, court_coverage: 78 },
-  closing:  { color: "#00ff99", serve_speed: 145, spin_rate: 3200, rally_length: 6, shot_accuracy: 72, reaction_time: 0.22, court_coverage: 81 },
-  cooldown: { color: "#00ff99", serve_speed: 80,  spin_rate: 2400, rally_length: 1, shot_accuracy: 62, reaction_time: 0.36, court_coverage: 58 }
+  warmup:   { color: "#00f6ff", serve_speed: 105, spin_rate: 2550, rally_length: 3, shot_accuracy: 76, reaction_time: 0.34, court_coverage: 68 },
+  rally:    { color: "#00e0ff", serve_speed: 116, spin_rate: 3100, rally_length: 6, shot_accuracy: 82, reaction_time: 0.28, court_coverage: 74 },
+  pressure: { color: "#ff8800", serve_speed: 119, spin_rate: 2950, rally_length: 4, shot_accuracy: 68, reaction_time: 0.24, court_coverage: 70 },
+  reset:    { color: "#38bdf8", serve_speed: 113, spin_rate: 3000, rally_length: 5, shot_accuracy: 81, reaction_time: 0.27, court_coverage: 72 },
+  extended: { color: "#ff0055", serve_speed: 117, spin_rate: 3350, rally_length: 9, shot_accuracy: 88, reaction_time: 0.26, court_coverage: 78 },
+  closing:  { color: "#00ff99", serve_speed: 122, spin_rate: 3200, rally_length: 6, shot_accuracy: 72, reaction_time: 0.22, court_coverage: 81 },
+  cooldown: { color: "#00ff99", serve_speed: 99,  spin_rate: 2400, rally_length: 1, shot_accuracy: 62, reaction_time: 0.36, court_coverage: 58 }
 });
 
 function buildDefaultSequence(profiles) {
@@ -205,7 +207,7 @@ function buildDefaultSequence(profiles) {
       coachCue: "Final push - empty the tank and own the court.",
       banner: "Game, Set, Match",
       bannerColor: profiles.closing.color,
-      metricsTarget: { serve_speed: 142, spin_rate: 3300, rally_length: 7, shot_accuracy: 78, reaction_time: 0.23, court_coverage: 80 },
+      metricsTarget: { serve_speed: 120, spin_rate: 3300, rally_length: 7, shot_accuracy: 78, reaction_time: 0.23, court_coverage: 80 },
       scoreboardDelta: [0, 0],
       scoreScript: { a: "GAME", b: "40", leader: "a" },
       momentumIntensity: 1.8,
@@ -960,7 +962,7 @@ export class DemoController {
 
   liveMetricUpdate(context = "rally") {
     const defaults = {
-      serve_speed: 110,
+      serve_speed: 114,
       spin_rate: 2950,
       rally_length: 5,
       shot_accuracy: 80,
