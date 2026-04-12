@@ -180,13 +180,37 @@ class ProfessionalPolishEngine {
   }
 
   /**
+   * Build validated URL for safe HTTP requests
+   */
+  buildValidatedUrl(baseUrl) {
+    try {
+      // Minimal path validation
+      if (baseUrl.includes('/../') || /\/%2e%2e\//i.test(baseUrl)) {
+        throw new Error('Invalid path');
+      }
+
+      const url = new URL(baseUrl);
+
+      // Protocol check
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        throw new Error('Invalid protocol');
+      }
+
+      return url.href;
+    } catch {
+      throw new Error('Invalid URL');
+    }
+  }
+
+  /**
    * Cache asset for offline use
    */
   async cacheAsset(assetPath) {
     try {
       if (this.offlineCache.has(assetPath)) return;
 
-      const response = await fetch(assetPath);
+      const validatedUrl = this.buildValidatedUrl(assetPath);
+      const response = await fetch(validatedUrl);
       if (response.ok) {
         const blob = await response.blob();
         this.offlineCache.set(assetPath, blob);
@@ -669,7 +693,8 @@ class ProfessionalPolishEngine {
 
     // Retry the failed request
     if (errorData.url) {
-      const response = await fetch(errorData.url);
+      const validatedUrl = this.buildValidatedUrl(errorData.url);
+      const response = await fetch(validatedUrl);
       if (response.ok) {
         this.showNotification('🔄 Network connection restored', 'success');
       }
