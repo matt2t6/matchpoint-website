@@ -224,9 +224,34 @@ export function setMasterVolume(multiplier) {
   }
 }
 
+function buildValidatedUrl(baseUrl) {
+  try {
+    // Minimal path validation
+    if (baseUrl.includes('/../') || /\/%2e%2e\//i.test(baseUrl)) {
+      throw new Error('Invalid path');
+    }
+    
+    const url = new URL(baseUrl);
+    
+    // Protocol + host checks
+    const allowedDomains = ['example.com']; // add your allowed domains here
+    if (!allowedDomains.includes(url.hostname)) {
+      throw new Error('Invalid host');
+    }
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      throw new Error('Invalid protocol');
+    }
+    
+    return url.href;
+  } catch {
+    throw new Error('Invalid URL');
+  }
+}
+
 export async function playCueAudio(url) {
   if (!ctx) {
-    const audio = new Audio(url);
+    const validatedUrl = buildValidatedUrl(url);
+    const audio = new Audio(validatedUrl);
     audio.volume = DEFAULT_GAIN.cue;
     audio.play().catch(() => {});
     return;
@@ -234,7 +259,8 @@ export async function playCueAudio(url) {
   stopSound("cue");
   ensureContext();
   try {
-    const res = await fetch(url);
+    const validatedUrl = buildValidatedUrl(url);
+    const res = await fetch(validatedUrl);
     if (!res.ok) throw new Error(`Cue load failed: ${res.status}`);
     const arrayBuffer = await res.arrayBuffer();
     const buffer = await ctx.decodeAudioData(arrayBuffer);
