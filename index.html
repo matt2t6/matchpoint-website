@@ -5176,7 +5176,6 @@
     <!-- Progress Bar -->
     <div id="scroll-progress-bar"></div>
 
-    </section><!-- End AEGIS Route -->
     </section><!-- End Home Route -->
 
     <!-- Quick Navigator Dropdown (fixed, body-level so it's always accessible) -->
@@ -7330,6 +7329,37 @@
 
       <!-- AO2022 LIVE MATCH PANEL — always visible -->
       <div id="ao2022-match-panel" style="max-width:1100px;margin:0 auto 0.75rem;"></div>
+
+      <!-- METROLOGY FORENSIC VISUALIZER -->
+      <div id="metrology-section" style="max-width:1100px;margin:1.5rem auto;background:rgba(10,25,47,0.8);border:1px solid rgba(0,245,212,0.2);border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+        <div style="padding:0.75rem 1rem;background:linear-gradient(90deg,rgba(0,245,212,0.1),transparent);border-bottom:1px solid rgba(0,245,212,0.1);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <span style="color:#00f5d4;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;font-size:0.75rem;">9D UKF Metrology Visualizer</span>
+            <span style="color:#64748b;font-size:0.65rem;margin-left:0.5rem;">Forensic Replay Engine v1.0</span>
+          </div>
+          <div id="metrology-status" style="font-weight:900;font-size:0.7rem;letter-spacing:0.05em;color:#22c55e;">INITIALIZING...</div>
+        </div>
+
+        <div id="metrology-container" style="position:relative;height:400px;background:#060e1e;">
+          <canvas id="metrology-canvas" style="width:100%;height:100%;"></canvas>
+
+          <!-- Forensic HUD Overlay -->
+          <div style="position:absolute;top:1rem;left:1rem;display:grid;grid-template-columns:repeat(2, 120px);gap:0.5rem;pointer-events:none;">
+            <div style="background:rgba(0,0,0,0.7);padding:0.4rem;border:1px solid rgba(255,255,255,0.1);border-radius:4px;">
+              <div style="color:#64748b;font-size:0.55rem;text-transform:uppercase;">Residual</div>
+              <div id="metrology-rmse" style="color:#00f5d4;font-size:0.9rem;font-weight:800;">0.00 mm</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.7);padding:0.4rem;border:1px solid rgba(255,255,255,0.1);border-radius:4px;">
+              <div style="color:#64748b;font-size:0.55rem;text-transform:uppercase;">Geometry (GDOP)</div>
+              <div id="metrology-gdop" style="color:#38bdf8;font-size:0.9rem;font-weight:800;">1.00</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.7);padding:0.4rem;border:1px solid rgba(255,255,255,0.1);border-radius:4px;">
+              <div style="color:#64748b;font-size:0.55rem;text-transform:uppercase;">Estimated Spin</div>
+              <div id="metrology-spin" style="color:#eab308;font-size:0.9rem;font-weight:800;">0 RPM</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </section>
 
@@ -12690,12 +12720,24 @@ function initializeKalmanChart() {
     <!-- AO2022 Live Match Demo -->
     <script src="assets/js/ao2022_frames.js"></script>
     <script src="assets/js/ao2022_match_panel.js"></script>
+    <script src="assets/js/metrology_visualizer.js"></script>
     <script>
       // Wire hero CTA + start-demo-btn to also launch the match panel
       (function() {
         function launchMatchPanel() {
           if (window.AO2022MatchPanel) {
             window.AO2022MatchPanel.build();
+
+            // Integrate Metrology Visualizer data loading
+            if (window.MetrologyVisualizer) {
+              fetch('demo_data.json')
+                .then(response => response.json())
+                .then(data => {
+                  window.MetrologyVisualizer.loadData(data);
+                })
+                .catch(err => console.error('[Metrology] Data load failed:', err));
+            }
+
             setTimeout(function() {
               window.AO2022MatchPanel.start();
             }, 400);
