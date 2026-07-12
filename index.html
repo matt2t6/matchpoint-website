@@ -2,19 +2,23 @@
 <html lang="en">
   <head>
     <script>
-      window.__MP__ = Object.assign({}, window.__MP__ || {}, {
-        // Frontend (Vite) port detection for Puter auth compatibility
-        VITE_PORT: window.location.port || '8000',
-        API: window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://api.matchpoint.ai',
-        SSE: window.location.hostname === 'localhost' ? 'http://localhost:5000/stream' : 'https://api.matchpoint.ai/api/sse',
-        ECHO: window.location.hostname === 'localhost' ? 'http://127.0.0.1:5001' : 'https://api.matchpoint.ai/echo'
-      });
+      // Global configuration and detection
+      (function() {
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        window.__MP__ = Object.assign({}, window.__MP__ || {}, {
+          VITE_PORT: window.location.port || '8000',
+          API: isLocal ? `http://localhost:5000` : 'https://api.matchpoint.ai',
+          SSE: isLocal ? `http://localhost:5000/stream` : 'https://api.matchpoint.ai/api/sse',
+          ECHO: isLocal ? 'http://127.0.0.1:5001' : 'https://api.matchpoint.ai/echo'
+        });
+      })();
 
       // Event-Driven Architecture: Centralized Event Bus
       class EventBus {
         constructor() {
           this.events = {};
           this.middlewares = [];
+          this._lastEmitTimes = {};
         }
 
         // Add middleware for event processing (logging, monitoring, etc.)
@@ -41,7 +45,6 @@
 
         // Performance optimization: throttle high-frequency events
         shouldThrottle(event, payload) {
-          // Define which events should be throttled to prevent performance issues
           const throttledEvents = [
             'telemetry:update',
             'chart:update',
@@ -53,37 +56,31 @@
             'resize'
           ];
 
-          // Check if this event type should be throttled
           if (throttledEvents.includes(event)) {
-            // Simple throttling: only allow every 100ms for high-frequency events
             const now = Date.now();
-            const lastEmit = this._lastEmitTimes?.[event] || 0;
+            const lastEmit = this._lastEmitTimes[event] || 0;
 
             if (now - lastEmit < 100) {
-              return true; // Throttle this event
+              return true;
             }
 
-            // Update last emit time
-            if (!this._lastEmitTimes) this._lastEmitTimes = {};
             this._lastEmitTimes[event] = now;
           }
 
-          return false; // Don't throttle
+          return false;
         }
 
         // Emit events with optional payload and performance optimization
         emit(event, payload = {}) {
-          // Performance optimization: throttle high-frequency events
           if (this.shouldThrottle(event, payload)) {
-            return this; // Skip throttled events for now
+            return this;
           }
 
           // Start tracing span for event emission
-          const traceContext = window.MatchPointTracing.startTrace(`event:${event}`);
+          const traceContext = window.MatchPointTracing?.startTrace(`event:${event}`) || { traceId: '0', spanId: '0' };
           const spanId = traceContext.spanId;
 
           try {
-            // Add correlation ID to payload
             const enhancedPayload = {
               ...payload,
               _traceId: traceContext.traceId,
@@ -92,64 +89,62 @@
               _timestamp: new Date().toISOString()
             };
 
-          // Apply middlewares
+            // Apply middlewares
             let processedPayload = enhancedPayload;
-          for (const middleware of this.middlewares) {
-            try {
-                window.MatchPointTracing.addSpanEvent(spanId, `middleware:${middleware.name || 'anonymous'}`, {
+            for (const middleware of this.middlewares) {
+              try {
+                window.MatchPointTracing?.addSpanEvent(spanId, `middleware:${middleware.name || 'anonymous'}`, {
                   event,
                   middlewareResult: typeof processedPayload
                 });
 
-              processedPayload = middleware(event, processedPayload);
+                processedPayload = middleware(event, processedPayload);
                 if (processedPayload === false) {
-                  window.MatchPointTracing.endSpan(spanId, { cancelled: true });
-                  return this; // Middleware can cancel event
+                  window.MatchPointTracing?.endSpan(spanId, { cancelled: true });
+                  return this;
                 }
-            } catch (error) {
-                window.MatchPointTracing.addSpanEvent(spanId, 'middleware_error', {
+              } catch (error) {
+                window.MatchPointTracing?.addSpanEvent(spanId, 'middleware_error', {
                   error: error.message,
                   middleware: middleware.name || 'anonymous'
                 });
-              console.error('[EventBus] Middleware error:', error);
+                console.error('[EventBus] Middleware error:', error);
+              }
             }
-          }
 
-          // Emit to subscribers
-          if (this.events[event]) {
-              window.MatchPointTracing.addSpanEvent(spanId, 'subscriber_count', {
+            // Emit to subscribers
+            if (this.events[event]) {
+              window.MatchPointTracing?.addSpanEvent(spanId, 'subscriber_count', {
                 count: this.events[event].length
               });
 
               this.events[event].forEach((sub, index) => {
-              try {
-                if (!sub.filter || sub.filter(processedPayload)) {
-                    window.MatchPointTracing.addSpanEvent(spanId, `subscriber_${index}`, {
+                try {
+                  if (!sub.filter || sub.filter(processedPayload)) {
+                    window.MatchPointTracing?.addSpanEvent(spanId, `subscriber_${index}`, {
                       hasFilter: !!sub.filter
                     });
-                  sub.callback(processedPayload);
-                }
-              } catch (error) {
-                  window.MatchPointTracing.addSpanEvent(spanId, `subscriber_error_${index}`, {
+                    sub.callback(processedPayload);
+                  }
+                } catch (error) {
+                  window.MatchPointTracing?.addSpanEvent(spanId, `subscriber_error_${index}`, {
                     error: error.message
                   });
-                console.error('[EventBus] Subscriber error:', error);
-              }
-            });
-          }
+                  console.error('[EventBus] Subscriber error:', error);
+                }
+              });
+            }
 
-          // Also emit to window for backward compatibility
-          window.dispatchEvent(new CustomEvent(event, { detail: processedPayload }));
+            // Dispatch to window for backward compatibility
+            window.dispatchEvent(new CustomEvent(event, { detail: processedPayload }));
 
-            // End successful span
-            window.MatchPointTracing.endSpan(spanId, {
+            window.MatchPointTracing?.endSpan(spanId, {
               subscribers: this.events[event]?.length || 0,
               success: true
             });
 
           } catch (error) {
-            // End span with error
-            window.MatchPointTracing.endSpan(spanId, {
+            window.MatchPointTracing?.endSpan(spanId, {
               error: error.message,
               success: false
             });
@@ -159,12 +154,10 @@
           return this;
         }
 
-        // Get list of active events (for debugging)
         getEvents() {
           return Object.keys(this.events);
         }
 
-        // Clear all subscribers
         clear() {
           this.events = {};
           return this;
@@ -502,27 +495,29 @@
         registerDefaultChecks() {
           // API connectivity check
           this.registerCheck('api_connectivity', async () => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
             try {
-              const response = await fetch(window.__MP__?.API + '/health' || '/health', {
-                timeout: 3000,
+              const response = await fetch(`${window.__MP__?.API}/health`, {
+                signal: controller.signal,
                 headers: { 'Cache-Control': 'no-cache' }
               });
+              clearTimeout(timeoutId);
               return { status: response.status, ok: response.ok };
             } catch (error) {
+              clearTimeout(timeoutId);
               throw new Error(`API unreachable: ${error.message}`);
             }
           }, { critical: true });
 
           // Database connectivity check (if applicable)
           this.registerCheck('database_connectivity', async () => {
-            // This would check actual database connection
-            // For now, simulate with a simple check
             return { status: 'simulated_ok' };
           }, { critical: true });
 
           // Memory usage check
           this.registerCheck('memory_usage', async () => {
-            if ('memory' in performance) {
+            if (performance && performance.memory) {
               const mem = performance.memory;
               const usagePercent = (mem.usedJSHeapSize / mem.totalJSHeapSize) * 100;
 
@@ -541,21 +536,25 @@
 
           // Security status check
           this.registerCheck('security_status', async () => {
-            const securityEvents = JSON.parse(localStorage.getItem('mp_security_audit') || '[]');
-            const recentEvents = securityEvents.filter(e =>
-              new Date(e.timestamp) > new Date(Date.now() - 3600000) // Last hour
-            );
+            try {
+              const auditLog = JSON.parse(localStorage.getItem('mp_security_audit') || '[]');
+              const recentThreshold = Date.now() - 3600000;
+              const criticalEvents = auditLog.filter(e =>
+                new Date(e.timestamp).getTime() > recentThreshold &&
+                (e.level === 'error' || e.level === 'critical')
+              );
 
-            const criticalEvents = recentEvents.filter(e => e.level === 'error' || e.level === 'critical');
+              if (criticalEvents.length > 5) {
+                throw new Error(`${criticalEvents.length} critical security events in last hour`);
+              }
 
-            if (criticalEvents.length > 0) {
-              throw new Error(`${criticalEvents.length} critical security events in last hour`);
+              return {
+                recentCritical: criticalEvents.length,
+                totalTracked: auditLog.length
+              };
+            } catch (e) {
+              return { status: 'audit_check_failed', error: e.message };
             }
-
-            return {
-              totalEvents: recentEvents.length,
-              criticalEvents: criticalEvents.length
-            };
           }, { critical: true });
 
           // Circuit breaker status
@@ -1027,6 +1026,13 @@
             this.telemetryData.emotionalComposure = data.emotionalComposure;
             this.checkEmotionalComposure();
           }
+
+          // Map Council Consensus to Trinity Radar
+          if (data.ai_insights && data.ai_insights.consensus) {
+            this.telemetryData.personaConsensus = data.ai_insights.consensus;
+            this.updateTrinityPentagon();
+          }
+
           this.updateUI();
         }
 
@@ -5808,7 +5814,7 @@
         </div><!-- End aegis-grid -->
 <div id="matchpoint-video-panel" style="position:relative;width:100%;max-width:960px;margin:24px auto;">
   <video id="matchVideoPlayer"
-    src="videos/match_demo.mp4"
+    src="assets/video/logo.mp4"
     style="width:100%;border-radius:8px;display:block;"
     controls
     preload="auto">
@@ -5859,9 +5865,9 @@
                 var dash = document.getElementById('dashboard');
                 if (dash) dash.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                // After scroll settles, fire both demo systems
+                // After scroll settles, fire all demo systems
                 setTimeout(function() {
-                  // Start telemetry ticker (aegisDemo)
+                  // 1. Start telemetry ticker (aegisDemo)
                   if (window.aegisDemo && !window.aegisDemo.isRunning) {
                     window.aegisDemo.start();
                     var startBtn = document.getElementById('start-demo-btn');
@@ -5869,37 +5875,19 @@
                     var pauseBtn = document.getElementById('pause-demo-btn');
                     if (pauseBtn) pauseBtn.disabled = false;
                   }
-                  // Start narrative director (composure arc, coaching cues, drift)
+                  // 2. Start narrative director (composure arc, coaching cues, drift)
                   if (typeof startDemoNarrative === 'function') {
                     startDemoNarrative();
+                  }
+                  // 3. Start court visualization (AO2022 Match Panel)
+                  if (window.AO2022MatchPanel && typeof window.AO2022MatchPanel.start === 'function') {
+                    window.AO2022MatchPanel.start();
                   }
                   btn.textContent = '✅ Demo Running';
                 }, 1200);
               })(this)"
             >
-              See the Working Demo
-            </button>
-            <button
-              id="hero-watch-btn"
-              class="cta-button font-bold py-4 px-10 rounded-xl text-lg shadow-lg"
-              style="background:transparent;border:2px solid rgba(0,245,212,0.6);color:#00f5d4;margin-top:0.75rem;"
-              onmouseover="this.style.background='rgba(0,245,212,0.12)'"
-              onmouseout="this.style.background='transparent'"
-              onclick="(function(){
-                var panel = document.getElementById('ao2022-match-panel');
-                if (panel) { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-                else {
-                  var dash = document.getElementById('dashboard');
-                  if (dash) dash.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-                setTimeout(function() {
-                  if (window.AO2022MatchPanel && typeof window.AO2022MatchPanel.start === 'function') {
-                    window.AO2022MatchPanel.start();
-                  }
-                }, 800);
-              })()"
-            >
-              ▶ Watch Live Demo
+              START THE DEMO
             </button>
             <div class="glass-card p-4 max-w-2xl mx-auto" style="border:1px solid rgba(0,245,212,0.35);">
               <p class="text-lg text-slate-300 font-semibold mb-2">
@@ -8317,7 +8305,7 @@
         // Environmental metrics hook with event-driven updates
         async function refreshEnvironmental(){
           try{
-            const r = await fetch('/api/environmental/state', { cache: 'no-store' });
+            const r = await fetch(resolveApiUrl('/api/environmental/state'), { cache: 'no-store' });
             if (!r.ok) throw new Error(r.status);
             const j = await r.json();
             const d = j.data || j.metrics || j;
@@ -8408,7 +8396,7 @@
               ...window.MatchPointSecurity.getSecurityHeaders()
             };
 
-            const r = await fetch('/echo/resonance-ping', {
+            const r = await fetch(resolveApiUrl('/echo/resonance-ping'), {
               method:'POST',
               headers,
               body: JSON.stringify(payload),
@@ -8666,7 +8654,7 @@
         // A/B Console: last 5 rows + arm mix
         async function refreshAB(){
           try{
-            const r = await fetch('/api/experiment/export', {cache:'no-store'});
+            const r = await fetch(resolveApiUrl('/api/experiment/export'), {cache:'no-store'});
             if (!r.ok) return;
             const text = await r.text();
             const rows = text.trim().split(/\r?\n/);
@@ -8935,7 +8923,7 @@
             });
 
             try {
-              await fetch('/api/experiment/log', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ session_id:`demo-${Date.now()}`, arm:(data.mode||'orchestrate_stub'), time_to_stability_ms: ms, anomaly_delta:0, sla_recovery_ms:0, extra:{ persona:data.persona, style:data.delivery_style } }) });
+              await fetch(resolveApiUrl('/api/experiment/log'), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ session_id:`demo-${Date.now()}`, arm:(data.mode||'orchestrate_stub'), time_to_stability_ms: ms, anomaly_delta:0, sla_recovery_ms:0, extra:{ persona:data.persona, style:data.delivery_style } }) });
             } catch (logError) {
               console.warn('[Orchestration] Logging failed:', logError);
             }
@@ -9294,19 +9282,23 @@
         refreshRallyStats();
       }
 
-      function refreshServeSpeed() {
-        const speed = Math.floor(Math.random() * 12) + 112; // 112-123 mph — Nadal AO2022 avg 116, max 124
-        const maxSpeed = Math.floor(Math.random() * 5) + 120; // 120-125 mph
-        document.getElementById("serve-speed").textContent = speed;
-        document.getElementById("max-serve").textContent = maxSpeed + " mph";
+      function refreshServeSpeed(data) {
+        const speed = (data && data.serveSpeed !== undefined) ? data.serveSpeed : Math.floor(Math.random() * 12) + 112;
+        const maxSpeed = (data && data.maxServe !== undefined) ? data.maxServe : Math.floor(Math.random() * 5) + 120;
+        const el1 = document.getElementById("serve-speed");
+        const el2 = document.getElementById("max-serve");
+        if (el1) el1.textContent = speed;
+        if (el2) el2.textContent = maxSpeed + " mph";
       }
 
-      function refreshSpinRate() {
-        const spinRate = Math.floor(Math.random() * 1500) + 2000; // 2000-3500 rpm
+      function refreshSpinRate(data) {
+        const spinRate = (data && data.spinRate !== undefined) ? data.spinRate : Math.floor(Math.random() * 1500) + 2000;
         const spinTypes = ["Topspin", "Backspin", "Sidespin", "Flat"];
-        const spinType = spinTypes[Math.floor(Math.random() * spinTypes.length)];
-        document.getElementById("spin-rate").textContent = spinRate;
-        document.getElementById("spin-type").textContent = spinType;
+        const spinType = (data && data.spinType) ? data.spinType : spinTypes[Math.floor(Math.random() * spinTypes.length)];
+        const el1 = document.getElementById("spin-rate");
+        const el2 = document.getElementById("spin-type");
+        if (el1) el1.textContent = spinRate;
+        if (el2) el2.textContent = spinType;
       }
 
       function refreshAccuracy() {

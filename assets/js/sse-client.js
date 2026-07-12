@@ -4,7 +4,9 @@
   function connect(){
     if (location.protocol === 'file:'){ dispatch('mp:sse:error'); return; }
     const tryUrls = [
+      (window.__MP__ && window.__MP__.SSE) || '/stream',
       '/sse',
+      'http://localhost:5000/stream',
       'http://localhost:5000/sse',
       'http://127.0.0.1:5000/sse'
     ];

@@ -60,6 +60,7 @@
   let lastCueIdx = -1;
   let challengePending = false;
   let lastBounceFrame = -1;
+  let apexImpactColumns = [];
   // Ball trail: ring buffer of last N positions {cx, cy, z, spd}
   const TRAIL_LEN = 6;   // shorter trail — less visual noise
   let ballTrail = [];          // [{cx,cy,z,spd}, ...] newest last
@@ -92,7 +93,7 @@
   const MAX_T = 420;
 
   // ── Match Audio Engine ─────────────────────────────────────
-  const AUDIO_BASE = '/assets/audio/match';
+  const AUDIO_BASE = '/assets/audio';
   const _audioCache = {};
   let _crowdLoop = null;
   let _rallyLoop = null;
@@ -925,7 +926,7 @@
               <span style="font-size:0.62rem;font-weight:700;color:#38bdf8;letter-spacing:0.02em;">Medvedev</span>
             </div>
           </div>
-          <!-- Dual bar: left = Nadal (amber), right = Medvedev (sky) -->  
+          <!-- Dual bar: left = Nadal (amber), right = Medvedev (sky) -->
           <div style="height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,0.06);display:flex;">
             <div id="ao22-nadal-bar" style="width:52%;background:linear-gradient(90deg,#d97706,#f59e0b);border-radius:3px 0 0 3px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);"></div>
             <div style="width:2px;background:rgba(6,10,22,0.9);"></div>
@@ -1329,6 +1330,7 @@
     // MatchPoint watermark
     ctx.font = '5.5px monospace'; ctx.fillStyle = 'rgba(0,245,212,0.06)';
     var _wm = perspMap(0.5, 0.5); ctx.fillText('MatchPoint™ ELC', _wm.cx, _wm.cy - 14);
+    renderApexImpacts(ctx);
 
     // ── Landing zone prediction ring ──
     if (landingZone) {
@@ -1852,9 +1854,10 @@
     const prevFrame = frameIdx > 1 ? window.AO2022_FRAMES[frameIdx-2] : null;
     const isBounce = !!(prevFrame && prevFrame.z > 0.06 && frame.z < 0.04 && frameIdx - lastBounceFrame > 3);
     if (isBounce) {
-      lastBounceFrame = frameIdx;
       // Track last bounce position for live trajectory line
       const _bp = dataToCanvas(frame.x, frame.y);
+      createApexImpact(_bp.cx, _bp.cy, (frame.call === "OUT" ? "#ef4444" : "#00f5d4"));
+      lastBounceFrame = frameIdx;
       lastBouncePos = { cx: _bp.cx, cy: _bp.cy, call: frame.call || 'IN' };
       // Add heatmap dot — store angle for directional ellipse rendering
       var dotAngle = 0;
@@ -3066,6 +3069,35 @@
     const g = parseInt(hex.slice(3,5),16);
     const b = parseInt(hex.slice(5,7),16);
     return `rgba(${r},${g},${b},${a})`;
+  }
+
+  
+  function renderApexImpacts(ctx) {
+    const now = performance.now();
+    apexImpactColumns = apexImpactColumns.filter(col => now - col.born < 1100);
+    apexImpactColumns.forEach(col => {
+      const age = (now - col.born) / 1100;
+      col.particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.life -= 0.012;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life * (1 - age));
+        ctx.fillStyle = col.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      });
+    });
+  }
+
+  function createApexImpact(cx, cy, color) {
+    const particles = [];
+    for (let i = 0; i < 22; i++) {
+      particles.push({
+        x: cx + (Math.random() - 0.5) * 8, y: cy,
+        vx: (Math.random() - 0.5) * 2.2, vy: -Math.random() * 5 - 2.5,
+        life: 1.0, size: 0.8 + Math.random() * 1.5
+      });
+    }
+    apexImpactColumns.push({ born: performance.now(), particles, color });
   }
 
   // ── Public API ────────────────────────────────────────────
